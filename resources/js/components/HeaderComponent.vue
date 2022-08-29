@@ -2,7 +2,7 @@
     <div class="container-fluid mb-3" style="background-color:#56688C;">
         <nav class="navbar" style="padding: 0.5rem 0.5rem;">
             <div>
-                <button class="btn navbar-toggler svg-key-c" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="btn navbar-toggler svg-key-c py-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     
                     <svg width="27" height="21" alt="Menu" viewBox="0 0 36 28"  xmlns="http://www.w3.org/2000/svg">
                     <rect width="36" height="6" />
@@ -10,21 +10,21 @@
                     <rect y="22" width="36" height="6" />
                     </svg>
                 </button>
-                <span class="navbar-brand mb-0 white-c">QUOTE trainer</span>
+                <span class="navbar-brand mb-0 white-c align-middle">QUOTE trainer</span>
                 <span class="navbar-text h2 bold mb-0 white-c align-middle mr-2">2022</span>
                 <button type="button" class="btn btn-lg key-c ol-key-c align-items-center" style="padding: 0.1rem 0.4rem; border: 2px solid; font-size: 1.5rem;">月</button>
             </div>
 
-            <div class="center-block">
+            <div>
                 <button class="btn svg-key-c" type="button">
-                    <svg width="24" height="40.5" viewBox="0 0 32 54" stroke="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="20" height="33.75" viewBox="0 0 32 54" stroke="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="0.860687" y="26.9055" width="5.77286" height="38.0678" transform="rotate(-45 0.860687 26.9055)"/>
                     <rect x="27.7787" width="5.77286" height="38.0069" transform="rotate(45 27.7787 0)" />
                     </svg>
                 </button>
                 <span class="navbar-text h2 mb-0 white-c align-middle">8月</span>
                 <button class="btn svg-key-c" type="button">
-                    <svg width="24" height="40.5" viewBox="0 0 32 54" stroke="none" transform="rotate(180)" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="20" height="33.75" viewBox="0 0 32 54" stroke="none" transform="rotate(180)" xmlns="http://www.w3.org/2000/svg">
                     <rect x="0.860687" y="26.9055" width="5.77286" height="38.0678" transform="rotate(-45 0.860687 26.9055)"/>
                     <rect x="27.7787" width="5.77286" height="38.0069" transform="rotate(45 27.7787 0)" />
                     </svg>
@@ -54,6 +54,6 @@
 
 <script>
     export default {    
-        year: new Date().getFullYear()
+        
     }
 </script>
