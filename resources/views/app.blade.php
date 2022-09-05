@@ -10,8 +10,8 @@
     <title> QUOTE trainer </title>
 
     <!-- Styles -->
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
-    <link href="/css/custom.css" rel="stylesheet">
+    <link href="{{ mix('/css/all.css') }}" rel="stylesheet">
+    <!-- <link href="/css/custom.css" rel="stylesheet">-->
 </head>
 <body class="bg-white-c">
 <div id="app" style="height: 100%;">
