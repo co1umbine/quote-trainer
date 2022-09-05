@@ -14,7 +14,7 @@
     <link href="/css/custom.css" rel="stylesheet">
 </head>
 <body class="bg-white-c">
-<div id="app">
+<div id="app" style="height: 100%;">
     <header-component></header-component>
 
     <router-view></router-view>

@@ -5,7 +5,8 @@
  */
 import VueRouter from "vue-router";
 import HeaderComponent from "./components/HeaderComponent";
-import CalendarComponent from "./components/CalendarComponent";
+import MCalendarComponent from "./components/MonthlyCalendarComponent";
+import WCalendarComponent from "./components/WeeklyCalendarComponent";
 import Vue from "vue";
 require('./bootstrap');
 
@@ -16,9 +17,14 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         {
-            path: '/calendar',
-            name: 'cal',
-            component: CalendarComponent
+            path: '/calendar/month',
+            name: 'cal-mon',
+            component: MCalendarComponent
+        },
+        {
+            path: '/calendar/week',
+            name: 'cal-wee',
+            component: WCalendarComponent
         },
     ]
 });

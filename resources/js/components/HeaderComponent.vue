@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid mb-3" style="background-color:#56688C;">
+    <div class="container-fluid" style="background-color:#56688C;">
         <nav class="navbar" style="padding: 0.5rem 0.5rem;">
             <div>
                 <button class="btn navbar-toggler svg-key-c py-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
