@@ -7,6 +7,7 @@ import VueRouter from "vue-router";
 import HeaderComponent from "./components/HeaderComponent";
 import MCalendarComponent from "./components/MonthlyCalendarComponent";
 import WCalendarComponent from "./components/WeeklyCalendarComponent";
+import sandboxComponent from "./components/CreateSchedulesModalComponent";
 import Vue from "vue";
 require('./bootstrap');
 
@@ -26,6 +27,11 @@ const router = new VueRouter({
             name: 'cal-wee',
             component: WCalendarComponent
         },
+        {
+            path: '/sandbox',
+            name: 'sandbox',
+            component: sandboxComponent
+        },
     ]
 });
 /**
@@ -41,6 +47,7 @@ const router = new VueRouter({
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('header-component', HeaderComponent);
+//Vue.component('create-modal-component', CreateSchModalComponent);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

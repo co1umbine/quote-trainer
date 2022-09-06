@@ -20,6 +20,7 @@
     <router-view></router-view>
 </div>
 <!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js" integrity="sha384-Qg00WFl9r0Xr6rUqNLv1ffTSSKEFFCDCKVyHZ+sVt8KuvG99nWw5RNvbhuKgif9z" crossorigin="anonymous"></script>
 <script src="{{ mix('/js/app.js') }}" defer></script>
 </body>
 </html>
