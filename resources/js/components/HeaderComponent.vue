@@ -101,11 +101,16 @@
                                 name="end-on" value="2018-06-12T19:30"
                                 min="2018-06-07T00:00" max="2018-06-14T00:00" class="form-control">
                         </div>
+
+                        <div class="mb-3">
+                            <label for="scheduleNote" class="form-label">備考</label>
+                            <textarea  type="text" class="form-control" id="scheduleNote"></textarea>
+                        </div>
                         
                     </div>
                     <div class="modal-footer">
                         
-                        <button type="button" class="btn btn-primary">続行</button>
+                        <button type="button" class="btn bg-base-c">続行</button>
                     </div>
                 </div>
             </div>

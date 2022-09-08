@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/schedules', 'ScheduleController@index');
+Route::post('/schedules', 'Schedulecontroller@store');
+Route::get('/schedules/{schedule}', 'ScheduleController@show');
+Route::put('/schedules/{schedule}', 'ScheduleController@update');
+Route::delete('schedules/{schedule}', 'ScheduleController@destroy');
