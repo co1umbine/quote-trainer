@@ -16,11 +16,30 @@
 <body class="bg-white-c">
 <div id="app" style="height: 100%;">
     <header-component></header-component>
+    <create-modal-component></create-modal-component>
 
     <router-view></router-view>
 </div>
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js" integrity="sha384-Qg00WFl9r0Xr6rUqNLv1ffTSSKEFFCDCKVyHZ+sVt8KuvG99nWw5RNvbhuKgif9z" crossorigin="anonymous"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js" integrity="sha384-Qg00WFl9r0Xr6rUqNLv1ffTSSKEFFCDCKVyHZ+sVt8KuvG99nWw5RNvbhuKgif9z" crossorigin="anonymous"></script> -->
 <script src="{{ mix('/js/app.js') }}" defer></script>
+<script>
+    let targetDate = {
+        dateObject: new Date(),
+        year: function(){
+            return this.dateObject.getFullYear();
+        },
+        month: function(){
+            return this.dateObject.getMonth();
+        },
+        date: function(){
+            return this.dateObject.getDate();
+        },
+        day: function(){
+            return this.dateObject.getDay();
+        }
+    }
+
+</script>
 </body>
 </html>
