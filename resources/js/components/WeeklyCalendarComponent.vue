@@ -63,6 +63,7 @@
             this.applyHeight();
             this.currentTimeBar();
             setInterval(function(){this.currentTimeBar();}.bind(this), 120000);  // 2分おきに更新
+            window.addEventListener('resize', this.applyHeight());
         },
         methods:{
             applyHeight: function(){

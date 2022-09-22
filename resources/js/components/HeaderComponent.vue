@@ -1,8 +1,8 @@
 <template>
-    <div class="container-fluid position-sticky" style="background-color:#56688C;" id="navHeader">
+    <div class="container-fluid position-sticky bg-base-c" id="navHeader">
         <nav class="navbar" style="padding: 0.5rem 0.5rem;">
             <div>
-                <button class="btn navbar-toggler svg-key-c py-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="btn navbar-toggler svg-key-c py-2" @click="" type="button">
                     
                     <svg width="27" height="21" alt="Menu" viewBox="0 0 36 28"  xmlns="http://www.w3.org/2000/svg">
                     <rect width="36" height="6" />
@@ -31,14 +31,14 @@
                 </button>
             </div>
 
-            <div class="d-none d-md-block">
+            <div>
                 <button class="btn svg-key-c" type="button" data-toggle="modal" data-target="#createSchedulesModal">
                     <svg width="34.5" height="34.5" viewBox="0 0 46 46"  xmlns="http://www.w3.org/2000/svg">
                     <rect x="19.7143" width="6.57143" height="46" />
                     <rect x="46" y="19.7143" width="6.57143" height="46" transform="rotate(90 46 19.7143)" />
                     </svg>
                 </button>
-                <button class="btn svg-key-c-no-fill" type="button">
+                <button class="btn svg-key-c-no-fill d-none d-md-inline" type="button">
                     <svg width="46" height="46" viewBox="0 0 61 61" fill="none"  xmlns="http://www.w3.org/2000/svg">
                     <path d="M50.0872 27.9218C46.1188 33.8772 38.0713 35.4899 32.1124 31.5228C26.1535 27.5557 24.5408 19.5118 28.5092 13.5564C32.4777 7.60098 40.5252 5.9883 46.484 9.95538C52.4429 13.9225 54.0556 21.9664 50.0872 27.9218Z" stroke-width="4"/>
                     <path d="M47.6543 47.4436C43.6859 53.399 35.6384 55.0117 29.6795 51.0446C23.7206 47.0775 22.1079 39.0336 26.0764 33.0782C30.0448 27.1228 38.0923 25.5101 44.0512 29.4772C50.01 33.4443 51.6227 41.4882 47.6543 47.4436Z" stroke-width="4"/>
@@ -81,7 +81,7 @@
                 const monthPath = "/calendar/month";
                 const weekPath = "/calendar/week";
                 const onClick = "location.href="
-                const spinerElement = document.createElement('span');
+                // const spinerElement = document.createElement('span');
 
                 if(path === monthPath){
                     m_w.textContent = "月";
@@ -112,6 +112,9 @@
                 }else if(path === weekPath){
                     targetDate.dateObject = new Date(targetDate.year(), targetDate.month(), targetDate.date()+7);
                 }
+            },
+            menuDraw: function(){
+                document.getElementById("drawer").classList.toggle("active");
             },
             onKeyDown: function(event){
                 if(event.key === "m" || event.key === "M"){
