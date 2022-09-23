@@ -58,6 +58,7 @@
         data(){
             return {
                 targetDate: targetDate,
+                schedules: schedules,
             }
         },
         computed:{
@@ -67,6 +68,7 @@
 
         mounted(){
             this.calendarType();
+            this.getSchedules();
             document.addEventListener('keydown', this.onKeyDown)
         },
         beforeDestroy() {
@@ -112,6 +114,13 @@
                 }else if(path === weekPath){
                     targetDate.dateObject = new Date(targetDate.year(), targetDate.month(), targetDate.date()+7);
                 }
+            },
+            getSchedules: function(){
+                axios.get('/api/schedules')
+                    .then((res)=>{
+                        schedules = res.data;
+                    });
+                return schedules;
             },
             menuDraw: function(){
                 document.getElementById("drawer").classList.toggle("active");

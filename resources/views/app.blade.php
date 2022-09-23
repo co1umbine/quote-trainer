@@ -39,6 +39,7 @@
             return this.dateObject.getDay();
         }
     }
+    let schedules = [];
 
 </script>
 </body>

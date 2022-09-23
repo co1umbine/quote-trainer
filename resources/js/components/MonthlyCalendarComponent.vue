@@ -27,14 +27,14 @@ import axios from 'axios';
         data(){
             return {
                 targetDate: targetDate,
-                schedules: [],
+                schedules: schedules,
                 weekCount: 5,
             }
         },
         mounted(){
             this.refleshCalendar();
             this.applyHeight();
-            this.getSchedules();
+            this.applySchedules();
             window.addEventListener('resize', this.applyHeight());
         },
         methods:{
@@ -68,44 +68,41 @@ import axios from 'axios';
                             const cellDateObject = new Date(year, month, (row*7+1)-firstDay+dayCount)
                             dateNumber = cellDateObject.getDate();
 
-                            let newElem = document.createElement("div");
-                            newElem.setAttribute("id", (cellDateObject.getMonth()+1)+"/"+dateNumber);
+                            // カレンダーセル作成
+                            let cellElem = document.createElement("div");
+                            cellElem.setAttribute("id", (cellDateObject.getMonth()+1)+"/"+dateNumber);
                             if((row==0 && dateNumber>22) || (row>=4 && dateNumber<7)){  // 前後月分岐
                                 if(dayCount == 0){  // 日曜日分岐
-                                    newElem.classList.add("cal-cell-day", "high-c-t");
+                                    cellElem.classList.add("cal-cell-day", "high-c-t");
                                 }else{
-                                    newElem.classList.add("cal-cell-day", "dark-c-t");
+                                    cellElem.classList.add("cal-cell-day", "dark-c-t");
                                 }
                             }else{
                                 if(dayCount == 0){
-                                    newElem.classList.add("cal-cell-day", "high-c");
+                                    cellElem.classList.add("cal-cell-day", "high-c");
                                 }else{
-                                    newElem.classList.add("cal-cell-day", "dark-c");
+                                    cellElem.classList.add("cal-cell-day", "dark-c");
                                 }
                             }
+
+                            // 今日装飾
                             if(today.getDate() === dateNumber && today.getMonth() === month && today.getFullYear() === year){
-                                newElem.classList.add("today-cell");
+                                cellElem.classList.add("today-cell");
                             }
+
+                            // 日付表示div
                             let numberElem = document.createElement("div");
                             numberElem.classList.add("scroll-lock", "bg-white-c");
                             numberElem.style.padding = "5px 0px 0px";
-
                             numberElem.textContent = dateNumber;
 
-                            newElem.appendChild(numberElem);
 
-                            newElem.appendChild(document.createElement("div"));
-
-                            elem.appendChild(newElem);
+                            cellElem.appendChild(numberElem);
+                            cellElem.appendChild(document.createElement("div"));  // scleduleが入るボックス
+                            elem.appendChild(cellElem);
                         }
                     }
                 }
-            },
-            getSchedules: function(){
-                axios.get('/api/schedules')
-                    .then((res)=>{
-                        this.schedules = res.data;
-                    });
             },
             applySchedules: function(){
                 this.schedules.forEach(s => {
