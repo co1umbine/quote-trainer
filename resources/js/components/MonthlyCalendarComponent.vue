@@ -34,6 +34,7 @@ import axios from 'axios';
         mounted(){
             this.refleshCalendar();
             this.applyHeight();
+            this.getSchedules();
             this.applySchedules();
             window.addEventListener('resize', this.applyHeight());
         },
@@ -48,6 +49,13 @@ import axios from 'axios';
                     let elem = document.getElementById("w"+(row+1));
                     elem.style.height = rowHeightPer + "%";
                 }
+            },
+            getSchedules: function(){
+                axios.get('/api/schedules')
+                    .then((res)=>{
+                        schedules = res.data;
+                        this.schedules = res.data;
+                    });
             },
             refleshCalendar: function(){
                 const year = this.targetDate.year();

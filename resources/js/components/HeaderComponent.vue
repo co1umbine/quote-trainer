@@ -68,7 +68,6 @@
 
         mounted(){
             this.calendarType();
-            this.getSchedules();
             document.addEventListener('keydown', this.onKeyDown)
         },
         beforeDestroy() {
@@ -115,13 +114,6 @@
                     targetDate.dateObject = new Date(targetDate.year(), targetDate.month(), targetDate.date()+7);
                 }
             },
-            getSchedules: function(){
-                axios.get('/api/schedules')
-                    .then((res)=>{
-                        schedules = res.data;
-                    });
-                return schedules;
-            },
             menuDraw: function(){
                 document.getElementById("drawer").classList.toggle("active");
             },
@@ -130,6 +122,8 @@
                     window.location.href = "/calendar/month";
                 }else if(event.key === "w" || event.key === "W"){
                     window.location.href = "/calendar/week";
+                }else if(event.key === "t" || event.key === "T"){
+                    targetDate = new Date();
                 }else if(event.key === "ArrowLeft" || event.key === "ArrowUp"){
                     this.decrement();
                 }else if(event.key === "ArrowRight" || event.key === "ArrowDown"){
