@@ -267,10 +267,10 @@ hr.now-line{
     text-align: left;
 	align-items: flex-start;
     display: block;
-    width: 100%;
+    width: 96%;
     line-height: 1; 
     padding: 0px 2px;
-    margin: 0px 2px;
+    margin: 2% 2%;
 }
 
 .top-text{
