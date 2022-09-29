@@ -1,7 +1,7 @@
 <template>
     <div class="container-xxl cal-window" style="" id="bodyBase">
         <!-- <div width="100%" height="100%" rurles="all" class="m-lg-0"> -->
-            <div class="base-c small" style="display: flex;">
+            <div class="base-c small cal-headline">
                 <div class="day-of-week high-c">SUN</div>
                 <div class="day-of-week">MON</div>
                 <div class="day-of-week">TUE</div>
@@ -34,8 +34,8 @@ import axios from 'axios';
         mounted(){
             this.refleshCalendar();
             this.applyHeight();
-            this.getSchedules();
             this.applySchedules();
+            this.getSchedules();
             window.addEventListener('resize', this.applyHeight());
         },
         methods:{
@@ -94,7 +94,7 @@ import axios from 'axios';
                             }
 
                             // 今日装飾
-                            if(today.getDate() === dateNumber && today.getMonth() === month && today.getFullYear() === year){
+                            if(today.getDate() === dateNumber && today.getMonth() === cellDateObject.getMonth() && today.getFullYear() === cellDateObject.getFullYear()){
                                 cellElem.classList.add("today-cell");
                             }
 
@@ -118,7 +118,7 @@ import axios from 'axios';
                     if(startDate.getMonth() !== this.targetDate.month()) return;
                     
                     const scheElem = document.createElement("button");
-                    scheElem.classList.add("btn", "btn-sm", "schedule");
+                    scheElem.classList.add("btn", "btn-sm", "schedule-month");
                     scheElem.textContent = s.name;
                     scheElem.style.background = "#" + s.color;
                     let blightness = Math.max(parseInt(s.color.slice(0,2), 16), parseInt(s.color.slice(2,4), 16), parseInt(s.color.slice(4), 16));

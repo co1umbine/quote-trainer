@@ -1,27 +1,27 @@
 <template>
-    <div class="container-xxl scroll" style="" id="bodyBase">
-        <table width="100%" rurles="all" class="mx-lg-0">
-            <tr class="base-c small">
-                <th class="cal-axis-time bg-white-c scroll-lock"></th>
-                <th class="day-and-date bg-white-c scroll-lock high-c" id="sunday">SUN<br>{{sunDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="monday">MON<br>{{monDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="tuesday">TUE<br>{{tueDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="wednesday">WED<br>{{wedDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="thursday">THU<br>{{thuDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="friday">FRI<br>{{friDate}}</th>
-                <th class="day-and-date bg-white-c scroll-lock" id="saturday">SAT<br>{{satDate}}</th>
-            </tr>
-            <tr class="cal-row-time" v-for="time in timeArray" :key="time" :id="time.slice(0,2)"> 
-                <td class="cal-axis-time">{{time}}</td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-0'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-1'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-2'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-3'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-4'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-5'"></td>
-                <td class="cal-cell-hour" :id="time.slice(0,2)+'-6'"></td>
-            </tr>
-        </table>
+    <div class="container-xxl scroll cal-window" style="" id="bodyBase">
+        <!-- <table width="100%" rurles="all" class="mx-lg-0"> -->
+        <div class="base-c small scroll-lock cal-headline">
+            <div class="cal-axis-time bg-white-c"></div>
+            <div class="day-and-date bg-white-c high-c" id="sunday">SUN<br>{{sunDate}}</div>
+            <div class="day-and-date bg-white-c" id="monday">MON<br>{{monDate}}</div>
+            <div class="day-and-date bg-white-c" id="tuesday">TUE<br>{{tueDate}}</div>
+            <div class="day-and-date bg-white-c" id="wednesday">WED<br>{{wedDate}}</div>
+            <div class="day-and-date bg-white-c" id="thursday">THU<br>{{thuDate}}</div>
+            <div class="day-and-date bg-white-c" id="friday">FRI<br>{{friDate}}</div>
+            <div class="day-and-date bg-white-c" id="saturday">SAT<br>{{satDate}}</div>
+        </div>
+        <div class="cal-row-time" v-for="time in timeArray" :key="time" :id="time.slice(0,2)"> 
+            <div class="cal-axis-time">{{time}}</div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-0'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-1'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-2'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-3'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-4'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-5'"></div>
+            <div class="cal-cell-hour" :id="time.slice(0,2)+'-6'"></div>
+        </div>
+        <!-- </table> -->
     </div>
 </template>
 
@@ -30,7 +30,8 @@
     export default {
         data(){
             return {
-                targetDate: targetDate
+                targetDate: targetDate,
+                schedules: schedules,
             }
         },
         computed:{
@@ -62,6 +63,8 @@
         mounted(){
             this.applyHeight();
             this.currentTimeBar();
+            this.applySchedules();
+            this.getSchedules();
             setInterval(function(){this.currentTimeBar();}.bind(this), 120000);  // 2分おきに更新
             window.addEventListener('resize', this.applyHeight());
         },
@@ -87,14 +90,89 @@
                 lineElem.setAttribute("width", "100%");
                 lineElem.setAttribute("style", "top: "+((nowDate.getMinutes()/60)*100-50).toString() + "%;");
                 nowElem.appendChild(lineElem);
+            },
+            getSchedules: function(){
+                axios.get('/api/schedules')
+                    .then((res)=>{
+                        schedules = res.data;
+                        this.schedules = res.data;
+                    });
+            },
+            refreshSchedules: function(){
+                let scheduleElems = document.getElementsByClassName("schedule-week");
+                const loopCount = scheduleElems.length;
+                for(let i=0; i< loopCount; i++){
+                    let s = scheduleElems[scheduleElems.length - 1];
+                    if(s){
+                        s.parentNode.removeChild(s);
+                    }
+                }
+            },
+            applySchedules: function(){
+                this.refreshSchedules();
+                this.schedules.forEach(s => {
+                    const startDate = new Date(s.start_on);
+                    const quote = new Date("1970-01-01 " + s.quote);
+                    const endDate = new Date(startDate);
+                    endDate.setHours(endDate.getHours()+quote.getHours(), endDate.getMinutes()+quote.getMinutes());
+                    // 同じ週か判定，週初めの日付が一致するか
+                    if(startDate.getDate()-startDate.getDay() !== this.targetDate.date()-this.targetDate.day()) return;
+
+                    const scheElem = document.createElement("button");
+                    scheElem.classList.add("btn", "btn-sm", "schedule-week");
+
+                    const spanElem = document.createElement("span");
+                    spanElem.textContent = s.name;
+                    spanElem.classList.add("top-text");
+                    scheElem.appendChild(spanElem);
+
+                    // 色指定
+                    scheElem.style.background = "#" + s.color;
+                    let blightness = Math.max(parseInt(s.color.slice(0,2), 16), parseInt(s.color.slice(2,4), 16), parseInt(s.color.slice(4), 16));
+                    if(blightness < 8){
+                        scheElem.classList.add("white-c");
+                    }else{
+                        scheElem.classList.add("dark-c");
+                    }
+                    
+                    // サイズ指定
+                    let dstDate = new Date(startDate);
+                    let dstStartTime = new Date(startDate);  // 複数日に渡るスケジュールでは 予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    dstDate.setHours(0, 0, 0, 0);
+                    while(dstDate <= endDate){
+                        if(isSameDate(dstDate, endDate)){
+                            scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
+                            scheElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100).toString() + "%";
+
+                            const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
+                            parent.appendChild(scheElem.cloneNode(true));
+                            break;
+                        }else{
+                            scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
+                            scheElem.style.height = (((23-dstStartTime.getHours())*60 + (60-dstStartTime.getMinutes()))/60*100).toString() + "%";
+
+                            const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
+                            parent.appendChild(scheElem.cloneNode(true));
+
+                            dstDate.setDate(dstDate.getDate() + 1);
+                            if(dstDate.getDay() === 0) return;
+                            dstStartTime = dstDate;
+                        }
+                    }
+
+                });
             }
         },
         watch:{
             targetDate: {
                 handler: function(newValue){
                     this.currentTimeBar();
+                    this.applySchedules();
                 },
                 deep: true
+            },
+            schedules: function(newValue){
+                this.applySchedules();
             }
         }
     }
