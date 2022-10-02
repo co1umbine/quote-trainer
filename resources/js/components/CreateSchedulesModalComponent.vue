@@ -17,7 +17,7 @@
                         <div class="mb-3">
                             <div>
                                 <label for="tags" class="form-label">タグ</label>
-                                <input name="tags" type="text" list="tags_list" id="tags_input" class="form-control" placeholder="Type to search...">
+                                <input name="tags" type="text" list="tags_list" id="tagsInput" class="form-control" placeholder="Type to search...">
                                 <datalist id="tags_list">
                                     リストから選択
                                     <select name="tags">
@@ -78,7 +78,7 @@
     export default {  
         data(){
             return {
-                selectedColor: '#A7CBD9',
+                selectedColor: "#A7CBD9",
                 targetDate: targetDate,
                 startOn: this.dispDate(targetDate.dateObject) + "T" + this.dispCeilMinute(targetDate.dateObject),
                 endOn: this.dispDate(targetDate.dateObject) + "T" + this.dispCeilMinute(new Date(targetDate.dateObject.setHours(targetDate.dateObject.getHours() + 1))),
@@ -97,16 +97,16 @@
                         return "";
                     }
                     if(quote.getTime() > 8.64e+7){
-                        return this.dispUTCDate(quote) +" "+ this.dispUTCTime(quote);
+                        return this.dispPeriodDate(quote) +"日 "+ this.dispPeriodTime(quote);
                     }else{
-                        return this.dispUTCTime(quote);
+                        return this.dispPeriodTime(quote);
                     }
                 }
             }
         },
         mounted(){
-            document.getElementById("tags_input").addEventListener("input", () => {
-                const elem = document.getElementById("tags_input");
+            document.getElementById("tagsInput").addEventListener("input", () => {
+                const elem = document.getElementById("tagsInput");
                 const val = elem.value;
                 elem.value = "";
                 // タグを新規に追加する機能？
@@ -115,12 +115,22 @@
                     this.selectedTags.push(val);
                 }
             });
+            $('#createSchedulesModal').on('show.bs.modal', this.refresh);
         },
         methods:{
+            refresh: function(){
+                this.selectedTags = [];
+                document.getElementById("scheduleName").value = "";
+                document.getElementById("tagsInput").value = "";
+                document.getElementById("scheduleNote").value = "";
+                this.selectedColor = "#A7CBD9";
+                const date = new Date();
+                this.startOn = this.dispDate(date) + "T" + this.dispCeilMinute(date);
+                this.endOn = this.dispDate(date) + "T" + this.dispCeilMinute(new Date(date.setHours(date.getHours() + 1)));
+            },
             deselectTag: function(tag){
                 if(!this.selectedTags.includes(tag)) return;
                 this.selectedTags = this.selectedTags.filter(n => n !== tag);
-
             },
             dispDate: function(date){
                 const YYYY = date.getFullYear();
@@ -140,13 +150,12 @@
 
                 return hh + ":" + mm;
             },
-            dispUTCDate: function(date){
-                const YYYY = date.getUTCFullYear();
-                const MM = ("00" + (date.getUTCMonth()+1)).slice(-2);
-                const DD = ("00" + date.getUTCDate()).slice(-2);
-                return YYYY + "-" + MM + "-" + DD;
+            dispPeriodDate: function(date){
+                const ms = date.getTime();
+                const DD = Math.floor(ms/ 8.64e+7);
+                return DD;
             },
-            dispUTCTime: function(date){
+            dispPeriodTime: function(date){
                 const hh = ("00" + date.getUTCHours()).slice(-2);
                 const mm = ("00" + date.getUTCMinutes()).slice(-2);
 
