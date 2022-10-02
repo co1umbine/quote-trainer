@@ -1,9 +1,9 @@
 <template>
-    <div class="modal" id="createSchedulesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal" id="createSchedulesModal" tabindex="-1" aria-labelledby="RegisterSchedule" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">スケジュール新規作成</h5>
+                        <h5 class="modal-title" id="RegisterSchedule">スケジュール新規作成</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -17,39 +17,46 @@
                         <div class="mb-3">
                             <div>
                                 <label for="tags" class="form-label">タグ</label>
-                                <input name="tags" list="tags_list" id="tags" class="form-control" placeholder="Type to search...">
+                                <input name="tags" type="text" list="tags_list" id="tags_input" class="form-control" placeholder="Type to search...">
                                 <datalist id="tags_list">
                                     リストから選択
                                     <select name="tags">
-                                        <option>追加するタグを選択</option>
-                                        <option>タグの例1</option>
-                                        <option>タグの例2</option>
-                                        <option>タグの例3</option>
+                                        <option v-for="tag in tags" :key="tag">{{ tag }}</option>
                                     </select>
                                 </datalist>
                             </div>
-                            <div>
-                                <button type="button" class="btn btn-sm m-2 dark-c bg-key-c btn-rounded">指定中のタグ</button>
+                            <div style="height: 45px;">
+                                <button v-for="tag in selectedTags" :key="tag" type="button" @click="deselectTag(tag)" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">{{ tag }}</button>
+                                <!-- <button type="button" @click="() => {}" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">指定中のタグ</button> -->
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <!--<label for="scheduleColor" class="form-label">スケジュール固有色</label> -->
-                            <input type="color" class="form-control form-control-color" id="scheduleColor" aria-describedby="colorHelp" value="#A7CBD9">
+                            <input type="color" v-model="selectedColor" class="form-control form-control-color" id="scheduleColor" aria-describedby="colorHelp"/>
+                            <button type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
+                            <button type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
+                            <button type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
+                            <button type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
+                            <button type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
+                            <button type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
                         </div>
 
-                        <div class="mb-3 form-inline">
+                        <div class="mb-3">
                             
-
+                            <label>見積もり期間： {{ quote }}</label>
+                            <div class="form-inline">
                             <input type="datetime-local" id="start-on"
-                                name="start-on" value="2018-06-12T19:30"
-                                min="2018-06-07T00:00" max="2018-06-14T00:00" class="form-control">
+                                name="start-on" v-model="startOn"
+                                class="form-control">
                                 
-                            <label for="start-on"> ～ </label>
+                            <!-- <label for="start-on"></label> -->
+                            <span>&nbsp;～&nbsp;</span>
 
                             <input type="datetime-local" id="end-on"
-                                name="end-on" value="2018-06-12T19:30"
-                                min="2018-06-07T00:00" max="2018-06-14T00:00" class="form-control">
+                                name="end-on" v-model="endOn"
+                                :min="startOn" class="form-control">
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -66,3 +73,85 @@
             </div>
         </div>
 </template>
+
+<script>
+    export default {  
+        data(){
+            return {
+                selectedColor: '#A7CBD9',
+                targetDate: targetDate,
+                startOn: this.dispDate(targetDate.dateObject) + "T" + this.dispCeilMinute(targetDate.dateObject),
+                endOn: this.dispDate(targetDate.dateObject) + "T" + this.dispCeilMinute(new Date(targetDate.dateObject.setHours(targetDate.dateObject.getHours() + 1))),
+                tags: ["タグの例1", "タグの例2", "タグの例3"],
+                selectedTags: [],
+            }
+        },
+        computed:{
+            quote: function(){
+                if(this.endOn !== ""){
+                    const endTime = new Date(this.endOn).getTime();
+                    const startTime = new Date(this.startOn).getTime();
+                    const quote = new Date(endTime - startTime);
+
+                    if(endTime <= startTime){
+                        return "";
+                    }
+                    if(quote.getTime() > 8.64e+7){
+                        return this.dispUTCDate(quote) +" "+ this.dispUTCTime(quote);
+                    }else{
+                        return this.dispUTCTime(quote);
+                    }
+                }
+            }
+        },
+        mounted(){
+            document.getElementById("tags_input").addEventListener("input", () => {
+                const elem = document.getElementById("tags_input");
+                const val = elem.value;
+                elem.value = "";
+                // タグを新規に追加する機能？
+                // tags.indexOf("rounded snout")
+                if(!this.selectedTags.includes(val)){
+                    this.selectedTags.push(val);
+                }
+            });
+        },
+        methods:{
+            deselectTag: function(tag){
+                if(!this.selectedTags.includes(tag)) return;
+                this.selectedTags = this.selectedTags.filter(n => n !== tag);
+
+            },
+            dispDate: function(date){
+                const YYYY = date.getFullYear();
+                const MM = ("00" + (date.getMonth()+1)).slice(-2);
+                const DD = ("00" + date.getDate()).slice(-2);
+                return YYYY + "-" + MM + "-" + DD;
+            },
+            dispTime: function(date){
+                const hh = ("00" + date.getHours()).slice(-2);
+                const mm = ("00" + date.getMinutes()).slice(-2);
+
+                return hh + ":" + mm;
+            },
+            dispCeilMinute: function(date){
+                const hh = ("00" + date.getHours()).slice(-2);
+                const mm = ("00" + (Math.ceil(date.getMinutes()/10)*10)).slice(-2);
+
+                return hh + ":" + mm;
+            },
+            dispUTCDate: function(date){
+                const YYYY = date.getUTCFullYear();
+                const MM = ("00" + (date.getUTCMonth()+1)).slice(-2);
+                const DD = ("00" + date.getUTCDate()).slice(-2);
+                return YYYY + "-" + MM + "-" + DD;
+            },
+            dispUTCTime: function(date){
+                const hh = ("00" + date.getUTCHours()).slice(-2);
+                const mm = ("00" + date.getUTCMinutes()).slice(-2);
+
+                return hh + ":" + mm;
+            }
+        }
+    }
+</script>

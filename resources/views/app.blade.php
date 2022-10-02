@@ -38,28 +38,27 @@
         }
     }
     let schedules = [];
+    let keyAcceptance = true;
+
 
     function isInSameWeek(dateObj1, dateObj2){
         // if(Math.ceil((dateObj1-dateObj2)/(60*60*24*1000))**2 >== 8**2 ) return false;  // 二つの時間差が8日以上であれば終了
 
-        const firstDate1 = new Date(dateObj1.getFullYear(), dateObj1.getMonth(), dateObj1.getDate()-dateObj1.getDay()).getTime();
-        const firstDate2 = new Date(dateObj2.getFullYear(), dateObj2.getMonth(), dateObj2.getDate()-dateObj2.getDay()).getTime();
+        const firstDate1 = new Date(dateObj1.getFullYear(), dateObj1.getMonth(), dateObj1.getDate()-dateObj1.getDay());
+        const firstDate2 = new Date(dateObj2.getFullYear(), dateObj2.getMonth(), dateObj2.getDate()-dateObj2.getDay());
 
-        return firstDate1 === firstDate2;
+        return firstDate1.getFullYear() === firstDate2.getFullYear() && firstDate1.getMonth() === firstDate2.getMonth() && firstDate1.getDate() === firstDate2.getDate();
     }
 
-    function isInSameMonthPage(dateObj1, dateObj2){
-        if((Math.ceil((dateObj1-dateObj2)/(60*60*24*1000))**2) >= 42**2 ) return false;  // 二つの時間差が42日以上であれば終了
-        if(dateObj1.getMonth() === dateObj2.getMonth()){
+    function isInMonthPage(dateObj, month){
+        if(dateObj.getMonth() === month){
             return true;
         }
-        const firstDate1 = new Date(dateObj1.getFullYear(), dateObj1.getMonth(), dateObj1.getDate()-dateObj1.getDay()).getMonth();
-        const lastDate1 = new Date(dateObj1.getFullYear(), dateObj1.getMonth(), dateObj1.getDate()-dateObj1.getDay()+6).getMonth();
+        // 週初めor最後が指定月にかかっていればtrue
+        const firstMonth = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()-dateObj.getDay()).getMonth();
+        const lastMonth = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()-dateObj.getDay()+6).getMonth();
 
-        const firstDate2 = new Date(dateObj2.getFullYear(), dateObj2.getMonth(), dateObj2.getDate()-dateObj2.getDay()).getMonth();
-        const lastDate2 = new Date(dateObj2.getFullYear(), dateObj2.getMonth(), dateObj2.getDate()-dateObj2.getDay()+6).getMonth();
-
-        return firstDate1 === firstDate2 || firstDate1 === lastDate2 || lastDate1 === firstDate1 || lastDate1 === lastDate2;
+        return firstMonth === month || lastMonth === month;
     }
 
     function isSameDate(dateObj1, dateObj2){

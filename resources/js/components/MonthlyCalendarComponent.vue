@@ -22,7 +22,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { elem } from '@webassemblyjs/ast/lib/nodes';
+
     export default {
         data(){
             return {
@@ -36,18 +37,23 @@ import axios from 'axios';
             this.applyHeight();
             this.applySchedules();
             this.getSchedules();
-            window.addEventListener('resize', this.applyHeight());
+            window.addEventListener('resize', this.applyHeight);
         },
         methods:{
             applyHeight: function(){
-                console.log("resize()")
                 const bodyElem = document.getElementById("bodyBase");
                 bodyElem.style.height = (window.innerHeight - document.getElementById("navHeader").clientHeight).toString() + "px";
                 const tdsSpaceRate = 1-30/(window.innerHeight - document.getElementById("navHeader").clientHeight);
                 const rowHeightPer = 100* tdsSpaceRate /this.weekCount;
-                for(let row=0; row<this.weekCount; ++row){
-                    let elem = document.getElementById("w"+(row+1));
-                    elem.style.height = rowHeightPer + "%";
+                for(let row=0; row<6; ++row){
+                    if(row < this.weekCount){
+                        let elem = document.getElementById("w"+(row+1));
+                        elem.style.height = rowHeightPer + "%";
+                        continue;
+                    }else{
+                        let elem = document.getElementById("w"+(row+1));
+                        elem.style.height = null;
+                    }
                 }
             },
             getSchedules: function(){
@@ -115,7 +121,7 @@ import axios from 'axios';
             applySchedules: function(){
                 this.schedules.forEach(s => {
                     const startDate = new Date(s.start_on);
-                    if(startDate.getMonth() !== this.targetDate.month()) return;
+                    if(!isInMonthPage(startDate, this.targetDate.month())) return;
                     
                     const scheElem = document.createElement("button");
                     scheElem.classList.add("btn", "btn-sm", "schedule-month");
@@ -137,6 +143,7 @@ import axios from 'axios';
             targetDate: {
                 handler: function(newValue){
                     this.refleshCalendar();
+                    this.applyHeight();
                     this.applySchedules();
                 },
                 deep: true

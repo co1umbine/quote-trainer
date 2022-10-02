@@ -54,6 +54,7 @@
 </template>
 
 <script>
+
     export default {    
         data(){
             return {
@@ -68,7 +69,13 @@
 
         mounted(){
             this.calendarType();
-            document.addEventListener('keydown', this.onKeyDown)
+            document.addEventListener('keydown', this.onKeyDown);
+            $('#createSchedulesModal').on('show.bs.modal', function (event) {
+                keyAcceptance =  false;
+            });
+            $('#createSchedulesModal').on('hidden.bs.modal', function (event) {
+                keyAcceptance =  true;
+            });
         },
         beforeDestroy() {
             document.removeEventListener('keydown', this.onKeyDown)
@@ -91,45 +98,62 @@
                     m_w.textContent = "週";
                     m_w.setAttribute('onclick', onClick + "'" +monthPath+"'");
                 }
-
-                // this.year = this.targetDate.year();
             },
+
             decrement: function(){
                 const path = location.pathname;
                 const monthPath = "/calendar/month";
                 const weekPath = "/calendar/week";
                 if(path === monthPath){
-                    targetDate.dateObject = new Date(this.targetDate.year(), this.targetDate.month()-1, this.targetDate.date());
+                    const prevMonth = this.targetDate.dateObject.getMonth();
+                    
+                    let dstDate = new Date(this.targetDate.dateObject.setMonth(this.targetDate.dateObject.getMonth()-1));
+
+                    if(prevMonth-1 !== dstDate.getMonth() && prevMonth !== 0){
+                        dstDate.setMonth(prevMonth).setDate(0);
+                    }
+                    targetDate.dateObject = dstDate;
                 }else if(path === weekPath){
-                    targetDate.dateObject = new Date(this.targetDate.year(), this.targetDate.month(), this.targetDate.date()-7);
+                    targetDate.dateObject = new Date(this.targetDate.dateObject.getFullYear(), this.targetDate.dateObject.getMonth(), this.targetDate.dateObject.getDate()-7);
                 }
             },
+
             increment: function(){
                 const path = location.pathname;
                 const monthPath = "/calendar/month";
                 const weekPath = "/calendar/week";
                 if(path === monthPath){
-                    targetDate.dateObject = new Date(targetDate.year(), targetDate.month()+1, targetDate.date());
+                    const prevMonth = this.targetDate.dateObject.getMonth();
+                    let dstDate = new Date(this.targetDate.dateObject.setMonth(this.targetDate.dateObject.getMonth()+1));
+
+                    if(prevMonth+1 !== dstDate.getMonth() && prevMonth !== 11){  // 31日など翌月に対応する日がない場合スキップされる現象への対応
+                        dstDate.setDate(0);
+                    }
+                    targetDate.dateObject = dstDate;
                 }else if(path === weekPath){
-                    targetDate.dateObject = new Date(targetDate.year(), targetDate.month(), targetDate.date()+7);
+                    targetDate.dateObject = new Date(this.targetDate.dateObject.getFullYear(), this.targetDate.dateObject.getMonth(), this.targetDate.dateObject.getDate()+7);
                 }
             },
+
             menuDraw: function(){
                 document.getElementById("drawer").classList.toggle("active");
             },
+
             onKeyDown: function(event){
+                if(!keyAcceptance) return;
+
                 if(event.key === "m" || event.key === "M"){
                     window.location.href = "/calendar/month";
                 }else if(event.key === "w" || event.key === "W"){
                     window.location.href = "/calendar/week";
                 }else if(event.key === "t" || event.key === "T"){
-                    targetDate = new Date();
+                    targetDate.dateObject = new Date();
                 }else if(event.key === "ArrowLeft" || event.key === "ArrowUp"){
                     this.decrement();
                 }else if(event.key === "ArrowRight" || event.key === "ArrowDown"){
                     this.increment();
                 }
             },
-        }
+        },
     }
 </script>

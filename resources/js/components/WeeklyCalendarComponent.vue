@@ -116,7 +116,7 @@
                     const endDate = new Date(startDate);
                     endDate.setHours(endDate.getHours()+quote.getHours(), endDate.getMinutes()+quote.getMinutes());
                     // 同じ週か判定，週初めの日付が一致するか
-                    if(startDate.getDate()-startDate.getDay() !== this.targetDate.date()-this.targetDate.day()) return;
+                    if(!isInSameWeek(startDate, this.targetDate.dateObject) || !isInSameWeek(endDate, this.targetDate.dateObject) || (startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
 
                     const scheElem = document.createElement("button");
                     scheElem.classList.add("btn", "btn-sm", "schedule-week");

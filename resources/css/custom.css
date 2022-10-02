@@ -140,6 +140,11 @@
     transition: fill 0.15s ease-in-out;
     transition: stroke 0.15s ease-in-out;
 }
+.btn.white-c :hover
+{
+    color: hsl(214, 100%, 87.3%);
+    transition: color 0.15s ease-in-out;
+}
 
 .nav-header{
     height: 66.55px;
@@ -297,4 +302,43 @@ hr.now-line{
     opacity: 1;
     visibility: visible;
     left: 0;
+}
+
+.bg-themeblue-c{
+    background-color: #a7cbd9;
+}
+
+.bg-themepurple-c{
+    background-color: #b5a7d9;
+}
+
+.bg-themepink-c{
+    background-color: #d9a7cb;
+}
+
+.bg-themeorange-c{
+    background-color: #d9b5a7;
+}
+
+.bg-themeyellow-c{
+    background-color: #cbd9a7;
+}
+
+.bg-themegreen-c{
+    background-color: #a7d9b5;
+}
+
+.color-select-btn{
+    margin: 5px;
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+.delete-self-btn:hover{
+    text-decoration: line-through;
+    background-color: gray;
+}
+
+.rounded-corner{
+    border-radius: 10px;
 }
