@@ -11,6 +11,9 @@
 
     <!-- Styles -->
     <link href="{{ mix('/css/all.css') }}" rel="stylesheet">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon-180×180.png" sizes="180×180">
+    <link rel="icon" type="image/png" href="/images/android-chrome-192×192.png" sizes="192×192">
     <!-- <link href="/css/custom.css" rel="stylesheet">-->
 </head>
 <body class="bg-white-c">
