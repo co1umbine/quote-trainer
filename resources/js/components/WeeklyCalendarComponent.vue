@@ -98,7 +98,7 @@
                         this.schedules = res.data;
                     });
             },
-            refreshSchedules: function(){
+            clearSchedules: function(){
                 let scheduleElems = document.getElementsByClassName("schedule-week");
                 const loopCount = scheduleElems.length;
                 for(let i=0; i< loopCount; i++){
@@ -109,24 +109,21 @@
                 }
             },
             applySchedules: function(){
-                this.refreshSchedules();
+                this.clearSchedules();
                 this.schedules.forEach(s => {
+                    if(s.name !== "name2")return;
                     const startDate = new Date(s.start_on);
-                    const quote = new Date("1970-01-01 " + s.quote);
+                    const quote = new Date(s.quote);
                     const endDate = new Date(startDate);
-                    endDate.setHours(endDate.getHours()+quote.getHours(), endDate.getMinutes()+quote.getMinutes());
-                    // 同じ週か判定，週初めの日付が一致するか
-                    if(!isInSameWeek(startDate, this.targetDate.dateObject) || !isInSameWeek(endDate, this.targetDate.dateObject) || (startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
+                    endDate.setHours(endDate.getHours()+Math.floor(quote.getTime()/3600000), endDate.getMinutes()+quote.getMinutes());
 
+                    // 同じ週か判定，週初めの日付が一致するかm
+                    if(!isInSameWeek(startDate, this.targetDate.dateObject) && !isInSameWeek(endDate, this.targetDate.dateObject) && !(startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
+                    console.log("run apply schedule " + s.name +" start " + startDate + " end " + endDate);
+
+                    // スケジュールオブジェクト
                     const scheElem = document.createElement("button");
                     scheElem.classList.add("btn", "btn-sm", "schedule-week");
-
-                    const spanElem = document.createElement("span");
-                    spanElem.textContent = s.name;
-                    spanElem.classList.add("top-text");
-                    scheElem.appendChild(spanElem);
-
-                    // 色指定
                     scheElem.style.background = "#" + s.color;
                     let blightness = Math.max(parseInt(s.color.slice(0,2), 16), parseInt(s.color.slice(2,4), 16), parseInt(s.color.slice(4), 16));
                     if(blightness < 8){
@@ -134,22 +131,34 @@
                     }else{
                         scheElem.classList.add("dark-c");
                     }
+
+                    // スケジュールタイトル
+                    const spanElem = document.createElement("span");
+                    spanElem.textContent = s.name;
+                    spanElem.classList.add("top-text");
+                    scheElem.appendChild(spanElem);
+
                     
                     // サイズ指定
-                    let dstDate = new Date(startDate);
-                    let dstStartTime = new Date(startDate);  // 複数日に渡るスケジュールでは 予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    let dstDate, dstStartTime;  // 複数日に渡るスケジュールでは 元の予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    if(isInSameWeek(startDate, this.targetDate.dateObject)){
+                        dstStartTime = new Date(startDate);
+                    }else{ 
+                        dstStartTime = new Date(this.targetDate.dateObject.getFullYear(), this.targetDate.dateObject.getMonth(), this.targetDate.dateObject.getDate()-this.targetDate.dateObject.getDay());
+                    }
+                    dstDate = new Date(dstStartTime);
                     dstDate.setHours(0, 0, 0, 0);
                     while(dstDate <= endDate){
-                        if(isSameDate(dstDate, endDate)){
+                        if(isSameDate(dstDate, endDate)){  // 予定は現在見てる日で終了するのか
                             scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
-                            scheElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100).toString() + "%";
+                            scheElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100*1.04).toString() + "%";
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));
                             break;
                         }else{
                             scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
-                            scheElem.style.height = (((23-dstStartTime.getHours())*60 + (60-dstStartTime.getMinutes()))/60*100).toString() + "%";
+                            scheElem.style.height = (((23-dstStartTime.getHours())*60 + (60-dstStartTime.getMinutes()))/60*100*1.04).toString() + "%";
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));

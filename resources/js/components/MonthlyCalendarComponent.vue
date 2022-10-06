@@ -118,7 +118,18 @@ import { elem } from '@webassemblyjs/ast/lib/nodes';
                     }
                 }
             },
+            refreshSchedules: function(){
+                let scheduleElems = document.getElementsByClassName("schedule-month");
+                const loopCount = scheduleElems.length;
+                for(let i=0; i< loopCount; i++){
+                    let s = scheduleElems[scheduleElems.length - 1];
+                    if(s){
+                        s.parentNode.removeChild(s);
+                    }
+                }
+            },
             applySchedules: function(){
+                this.refreshSchedules();
                 this.schedules.forEach(s => {
                     const startDate = new Date(s.start_on);
                     if(!isInMonthPage(startDate, this.targetDate.month())) return;

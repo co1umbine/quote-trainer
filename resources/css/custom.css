@@ -140,10 +140,9 @@
     transition: fill 0.15s ease-in-out;
     transition: stroke 0.15s ease-in-out;
 }
-.btn.white-c :hover
+.white-c.btn :hover
 {
     color: hsl(214, 100%, 87.3%);
-    transition: color 0.15s ease-in-out;
 }
 
 .nav-header{
@@ -340,5 +339,5 @@ hr.now-line{
 }
 
 .rounded-corner{
-    border-radius: 10px;
+    border-radius: 20px;
 }
