@@ -32,6 +32,7 @@
             return {
                 targetDate: targetDate,
                 schedules: schedules,
+                schedulesCount: [0, 0, 0, 0, 0, 0, 0],
             }
         },
         computed:{
@@ -99,6 +100,7 @@
                     });
             },
             clearSchedules: function(){
+                this.schedulesCount = [0, 0, 0, 0, 0, 0, 0];
                 let scheduleElems = document.getElementsByClassName("schedule-week");
                 const loopCount = scheduleElems.length;
                 for(let i=0; i< loopCount; i++){
@@ -111,13 +113,12 @@
             applySchedules: function(){
                 this.clearSchedules();
                 this.schedules.forEach(s => {
-                    if(s.name !== "name2")return;
                     const startDate = new Date(s.start_on);
                     const quote = new Date(s.quote);
                     const endDate = new Date(startDate);
                     endDate.setHours(endDate.getHours()+Math.floor(quote.getTime()/3600000), endDate.getMinutes()+quote.getMinutes());
 
-                    // 同じ週か判定，週初めの日付が一致するかm
+                    // 同じ週になければ終了次の予定へ，週初めの日付が一致するか判定
                     if(!isInSameWeek(startDate, this.targetDate.dateObject) && !isInSameWeek(endDate, this.targetDate.dateObject) && !(startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
 
                     // スケジュールオブジェクト
@@ -143,10 +144,10 @@
                     spanElem.textContent = s.name;
                     spanElem.classList.add("top-text");
                     scheElem.appendChild(spanElem);
-
                     
-                    // サイズ指定
-                    let dstDate, dstStartTime;  // 複数日に渡るスケジュールでは 元の予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    // サイズ指定 生成
+                    let dstDate, dstStartTime;  // 複数日に渡るスケジュールでは 予定ボタンの始まりは 元の予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    const baseZIndex = 10;
                     if(isInSameWeek(startDate, this.targetDate.dateObject)){
                         dstStartTime = new Date(startDate);
                     }else{ 
@@ -155,9 +156,13 @@
                     dstDate = new Date(dstStartTime);
                     dstDate.setHours(0, 0, 0, 0);
                     while(dstDate <= endDate){
-                        if(isSameDate(dstDate, endDate)){  // 予定は現在見てる日で終了するのか
+                        if(isSameDate(dstDate, endDate)){  // 予定が現在見てる日で終了する場合
                             scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
                             scheElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100*1.04).toString() + "%";
+                            
+                            // 重なり調整
+                            scheElem.style.zIndex = baseZIndex + this.schedulesCount[dstDate.getDay()];
+                            this.schedulesCount[dstDate.getDay()] += 1;
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));
@@ -165,6 +170,12 @@
                         }else{
                             scheElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
                             scheElem.style.height = (((23-dstStartTime.getHours())*60 + (60-dstStartTime.getMinutes()))/60*100*1.04).toString() + "%";
+                            scheElem.style.right = "0%";
+
+                            // 重なり調整
+                            scheElem.style.zIndex = baseZIndex + this.schedulesCount[dstDate.getDay()];
+                            scheElem.style.width = 96/(this.schedulesCount[dstDate.getDay()]+1).toString() + "%";
+                            this.schedulesCount[dstDate.getDay()] += 1;
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));

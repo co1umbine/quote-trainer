@@ -217,6 +217,7 @@ html, body { height: 100%; }
 
 .cal-cell-hour
 {
+    position: relative;
     width: 13%;
     height: 50px;
     text-align: center;
@@ -268,7 +269,7 @@ hr.now-line{
 }
 
 .schedule-week {
-    position: relative;
+    position: absolute;
     text-align: left;
 	align-items: flex-start;
     display: block;
@@ -276,6 +277,7 @@ hr.now-line{
     line-height: 1; 
     padding: 0px 2px;
     margin: 2% 2%;
+    box-shadow: 0 0 10px 0 rgba(77, 93, 125, 0.5);
 }
 
 .top-text{
