@@ -255,6 +255,7 @@ hr.now-line{
     border: none;
     border-top: 3px solid #A61F38;
     margin: 0px;
+    z-index: 90;
 }
 
 .schedule-month{

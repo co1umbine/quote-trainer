@@ -32,7 +32,7 @@
             </div>
 
             <div>
-                <button class="btn svg-key-c" type="button" data-toggle="modal" data-target="#createSchedulesModal">
+                <button id="plusBtn" class="btn svg-key-c" type="button" data-toggle="modal" data-target="#schedulesModal">
                     <svg width="34.5" height="34.5" viewBox="0 0 46 46"  xmlns="http://www.w3.org/2000/svg">
                     <rect x="19.7143" width="6.57143" height="46" />
                     <rect x="46" y="19.7143" width="6.57143" height="46" transform="rotate(90 46 19.7143)" />
@@ -70,10 +70,10 @@
         mounted(){
             this.calendarType();
             document.addEventListener('keydown', this.onKeyDown);
-            $('#createSchedulesModal').on('show.bs.modal', function (event) {
+            $('#schedulesModal').on('show.bs.modal', function (event) {
                 keyAcceptance =  false;
             });
-            $('#createSchedulesModal').on('hidden.bs.modal', function (event) {
+            $('#schedulesModal').on('hidden.bs.modal', function (event) {
                 keyAcceptance =  true;
             });
         },

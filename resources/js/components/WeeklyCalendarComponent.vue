@@ -119,7 +119,6 @@
 
                     // 同じ週か判定，週初めの日付が一致するかm
                     if(!isInSameWeek(startDate, this.targetDate.dateObject) && !isInSameWeek(endDate, this.targetDate.dateObject) && !(startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
-                    console.log("run apply schedule " + s.name +" start " + startDate + " end " + endDate);
 
                     // スケジュールオブジェクト
                     const scheElem = document.createElement("button");
@@ -131,6 +130,13 @@
                     }else{
                         scheElem.classList.add("dark-c");
                     }
+
+                    // 詳細ウィンドウ用設定
+                    // data-toggle="modal" data-target="#schedulesModal" data-schedule=id
+                    scheElem.setAttribute("data-toggle", "modal");
+                    scheElem.setAttribute("data-target", "#schedulesModal");
+                    scheElem.setAttribute("data-schedule", s.id);
+
 
                     // スケジュールタイトル
                     const spanElem = document.createElement("span");

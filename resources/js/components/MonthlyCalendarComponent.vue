@@ -137,6 +137,8 @@ import { elem } from '@webassemblyjs/ast/lib/nodes';
                     const scheElem = document.createElement("button");
                     scheElem.classList.add("btn", "btn-sm", "schedule-month");
                     scheElem.textContent = s.name;
+
+                    // 色
                     scheElem.style.background = "#" + s.color;
                     let blightness = Math.max(parseInt(s.color.slice(0,2), 16), parseInt(s.color.slice(2,4), 16), parseInt(s.color.slice(4), 16));
                     if(blightness < 8){
@@ -144,6 +146,12 @@ import { elem } from '@webassemblyjs/ast/lib/nodes';
                     }else{
                         scheElem.classList.add("dark-c");
                     }
+
+                    // 詳細ウィンドウ用設定
+                    // data-toggle="modal" data-target="#schedulesModal" data-schedule=id
+                    scheElem.setAttribute("data-toggle", "modal");
+                    scheElem.setAttribute("data-target", "#schedulesModal");
+                    scheElem.setAttribute("data-schedule", s.id);
 
                     const parent = document.getElementById((startDate.getMonth()+1)+"/"+startDate.getDate()).lastElementChild;
                     parent.appendChild(scheElem);
