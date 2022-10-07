@@ -68,6 +68,9 @@
             this.getSchedules();
             setInterval(function(){this.currentTimeBar();}.bind(this), 120000);  // 2分おきに更新
             window.addEventListener('resize', this.applyHeight());
+            $('#schedulesModal').on('hidden.bs.modal', function (event) {
+                this.getSchedules();
+            });
         },
         methods:{
             applyHeight: function(){

@@ -38,6 +38,7 @@ import { elem } from '@webassemblyjs/ast/lib/nodes';
             this.applySchedules();
             this.getSchedules();
             window.addEventListener('resize', this.applyHeight);
+            $('#schedulesModal').on('hidden.bs.modal', this.getSchedules);
         },
         methods:{
             applyHeight: function(){

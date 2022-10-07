@@ -69,7 +69,9 @@
                 </div>
                 <div class="modal-footer">
                     <!-- <button v-if="this.viewOnly" type="button" @click="" class="btn white-c bg-base-c">削除</button> -->
-                    <button v-show="!this.viewOnly" type="button" data-dismiss="modal" aria-label="Close" class="btn ol-dark-c dark-c">キャンセル</button>
+                    
+                    <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
+                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true;}" class="btn ol-dark-c dark-c">キャンセル</button>
                     <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
                     <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? tentativeUpdate() : tentative()}" class="btn white-c bg-base-c">続行</button>
                 </div>
@@ -201,9 +203,11 @@ function paramsSerializer(params) {
                 }
                 axios.post("/api/schedules", schedule)
                     .then((res) => {
-                    schedules.push(schedule);
                         $("#schedulesModal").modal("hide");
                     })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             tentativeUpdate: function(){
                 if(this.nameText === "") {
@@ -227,16 +231,23 @@ function paramsSerializer(params) {
 
                 axios.put('/api/schedules/' + this.srcSchedule.id, schedule)
                     .then((res) => {
-                        schedules.splice(index, 1, schedule);
                         $("#createSchedulesModal").modal("hide");
                     })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
 
             },
-            switchToModification: function(){
-                this.viewOnly = false;
-            },
-            switchToView: function(){
-                this.viewOnly = true;
+            deleteSchedule: function(){
+                const flag = confirm("本当に予定 " +this.srcSchedule.name+ " を削除しますか？");
+                if(!flag) return;
+                axios.delete('/api/schedules/' + this.srcSchedule.id)
+                    .then((res) => {
+                        $("#createSchedulesModal").modal("hide");
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             dispDate: function(date){
                 const YYYY = date.getFullYear();
