@@ -8,7 +8,7 @@ use App\Schedule;
 class ScheduleController extends Controller
 {
     public function index(){
-        return Schedule::all();
+        return Schedule::with('tags')->get()->all();
     }
     public function store(Request $request){
         return Schedule::create($request->all());
