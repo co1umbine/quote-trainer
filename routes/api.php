@@ -22,3 +22,8 @@ Route::post('/schedules', 'Schedulecontroller@store');
 Route::get('/schedules/{schedule}', 'ScheduleController@show');
 Route::put('/schedules/{schedule}', 'ScheduleController@update');
 Route::delete('schedules/{schedule}', 'ScheduleController@destroy');
+Route::get('/tags', 'TagController@index');
+Route::post('/tags', 'TagController@store');
+Route::get('/tags/{tag}', 'TagController@show');
+Route::put('/tags/{tag}', 'TagController@update');
+Route::delete('tags/{tag}', 'TagController@destroy');
