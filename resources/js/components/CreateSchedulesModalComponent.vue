@@ -18,13 +18,13 @@
                     <div class="mb-3">
                         <div>
                             <label for="tags" class="form-label">タグ</label>
-                            <input v-show="!viewOnly" name="tags" type="text" list="tags_list" id="tagsInput" class="form-control" placeholder="Type to search...">
-                            <datalist v-show="!viewOnly" id="tags_list">
-                                リストから選択
-                                <select name="tags">
-                                    <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+                            <!-- <input v-show="!viewOnly" name="tags" type="text" list="tags_list" id="tagsInput" class="form-control" placeholder="Type to search..."> -->
+                            <!-- <datalist v-show="!viewOnly" id="tags_list"> -->
+                                <select v-show="!viewOnly" name="tags" id="tagsInput" class="form-control">
+                                    <option hidden>選択してください</option>
+                                    <option v-for="tag in tags" :key="tag" :value="tag">{{ tag }}</option>
                                 </select>
-                            </datalist>
+                            <!-- </datalist> -->
                         </div>
                         <div style="height: 45px;">
                             <button v-for="tag in selectedTags" :key="tag" type="button" @click="deselectTag(tag)" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">{{ tag }}</button>
@@ -72,7 +72,7 @@
                     
                     <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
                     <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true;}" class="btn ol-dark-c dark-c">キャンセル</button>
-                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
+                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false; tagApply();}" class="btn white-c bg-base-c">編集</button>
                     <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? tentativeUpdate() : tentative()}" class="btn white-c bg-base-c">続行</button>
                 </div>
             </div>
@@ -155,12 +155,13 @@ function paramsSerializer(params) {
         methods:{
             tagApply: function(){
                 if(document.getElementById("tagsInput") === null) return;
-                document.getElementById("tagsInput").addEventListener("input", () => {
-                    const elem = $("#tagsInput");
-                    const val = elem.value;
-                    elem.value = "";
+                document.getElementById("tagsInput").addEventListener("change", (event) => {
+                    const val = event.target.value;
+                    $("#tagsInput").val("");
+                    console.log("through if " + $("tagsInput"));
                     // TODO タグを新規に追加する機能？
-                    if(!this.selectedTags.includes(val)){
+                    if(!this.tags.includes(val)) return;  // 未知の文字列
+                    if(!this.selectedTags.includes(val)){  // 重複チェック
                         this.selectedTags.push(val);
                     }
                 });
