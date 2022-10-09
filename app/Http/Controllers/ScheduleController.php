@@ -11,13 +11,23 @@ class ScheduleController extends Controller
         return Schedule::with('tags')->get()->all();
     }
     public function store(Request $request){
-        return Schedule::create($request->all());
+        $params = $request->only(['user_id','name','color','start_on','quote','note']);
+        //TODO バリデーション
+        $schedule = Schedule::create($params);
+
+        $tags = $request->input('tags');
+        $schedule->tags()->sync($tags);
+        return $schedule;
     }
     public function show(Schedule $schedule){
         return $schedule;
     }
     public function update(Request $request, Schedule $schedule){
-        $schedule->update($request->all());
+        $params = $request->only(['user_id','name','color','start_on','quote','note']);
+        //TODO バリデーション
+        $schedule->update($params);
+        $tags = $request->input('tags');
+        $schedule->tags()->sync($tags);
         return $schedule;
     }
     public function destroy(Schedule $schedule){
