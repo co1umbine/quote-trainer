@@ -8,16 +8,21 @@ use App\Tag;
 class TagController extends Controller
 {
     public function index(){
-        return Tag::all();
+        return Tag::with('schedules')->get()->all();
     }
     public function store(Request $request){
-        return Tag::create($request->all());
+        $params = $request->only(['user_id','name','color']);
+        //TODO バリデーション
+        $tag = Tag::create($params);
+        return $tag;
     }
     public function show(Tag $tag){
         return $tag;
     }
     public function update(Request $request, Tag $tag){
-        $tag->update($request->all());
+        $params = $request->only(['user_id','name','color']);
+        //TODO バリデーション
+        $tag->update($params);
         return $tag;
     }
     public function destroy(Tag $tag){
