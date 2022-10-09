@@ -72,7 +72,7 @@
                     
                     <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
                     <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true;}" class="btn ol-dark-c dark-c">キャンセル</button>
-                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false; tagApply();}" class="btn white-c bg-base-c">編集</button>
+                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
                     <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? tentativeUpdate() : tentative()}" class="btn white-c bg-base-c">続行</button>
                 </div>
             </div>
@@ -154,11 +154,9 @@ function paramsSerializer(params) {
         },
         methods:{
             tagApply: function(){
-                if(document.getElementById("tagsInput") === null) return;
                 document.getElementById("tagsInput").addEventListener("change", (event) => {
                     const val = event.target.value;
                     $("#tagsInput").val("");
-                    console.log("through if " + $("tagsInput"));
                     // TODO タグを新規に追加する機能？
                     if(!this.tags.includes(val)) return;  // 未知の文字列
                     if(!this.selectedTags.includes(val)){  // 重複チェック
