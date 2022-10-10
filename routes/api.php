@@ -27,3 +27,8 @@ Route::post('/tags', 'TagController@store');
 Route::get('/tags/{tag}', 'TagController@show');
 Route::put('/tags/{tag}', 'TagController@update');
 Route::delete('tags/{tag}', 'TagController@destroy');
+Route::get('/experiences', 'ExperienceController@index');
+Route::post('/experiences', 'ExperienceController@store');
+Route::get('/experiences/{experience}', 'ExperienceController@show');
+Route::put('/experiences/{experience}', 'ExperienceController@update');
+Route::delete('experiences/{experience}', 'ExperienceController@destroy');

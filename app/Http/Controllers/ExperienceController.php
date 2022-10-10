@@ -8,14 +8,14 @@ use App\Experience;
 class ExperienceController extends Controller
 {
     public function index(){
-        return Experience::with('tags')->get()->all();
+        return Experience::with('tags')->get();
     }
     public function store(Request $request){
         $params = $request->only(['user_id','schedule_id','name','color','start_on','end_on','quote','period','efficiency','note']);
         //TODO バリデーション
         $experience = Experience::create($params);
 
-        $tags = $request->input('tags');
+        $tags = array_fill_keys($request->input('tags'), ['user_id' => $experience->user_id]);
         $experience->tags()->sync($tags);
         return $experience;
     }
@@ -26,7 +26,8 @@ class ExperienceController extends Controller
         $params = $request->only(['user_id','schedule_id','name','color','start_on','end_on','quote','period','efficiency','note']);
         //TODO バリデーション
         $experience->update($params);
-        $tags = $request->input('tags');
+        
+        $tags = array_fill_keys($request->input('tags'), ['user_id' => $experience->user_id]);
         $experience->tags()->sync($tags);
         return $experience;
     }
