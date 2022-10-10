@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import { elem } from '@webassemblyjs/ast/lib/nodes';
 
     export default {
         data(){

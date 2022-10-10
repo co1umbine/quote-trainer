@@ -26,6 +26,7 @@ class ScheduleController extends Controller
         $params = $request->only(['user_id','name','color','start_on','quote','note']);
         //TODO バリデーション
         $schedule->update($params);
+        
         $tags = array_fill_keys($request->input('tags'), ['user_id' => $schedule->user_id]);
         $schedule->tags()->sync($tags);
         return $schedule;
