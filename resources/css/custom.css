@@ -24,14 +24,14 @@
     fill:none;
 }
 
-.btn.svg-key-c :hover
+.btn.svg-key-c:hover
 {
     fill: hsl(174, 72%, 73.8%);
     stroke: hsl(174, 72%, 73.8%);
     transition: fill 0.15s ease-in-out;
     transition: stroke 0.15s ease-in-out;
 }
-.btn.svg-key-c-no-fill :hover
+.btn.svg-key-c-no-fill:hover
 {
     stroke: hsl(174, 72%, 73.8%);
     transition: stroke 0.15s ease-in-out;
@@ -53,7 +53,7 @@
     stroke: #56688C;
 }
 
-.btn.svg-base-c :hover
+.btn.svg-base-c:hover
 {
     fill: hsl(220, 24%, 39.6%);
     stroke: hsl(220, 24%, 39.6%);
@@ -81,7 +81,7 @@
     stroke: #232A40;
 }
 
-.btn.svg-dark-c :hover
+.btn.svg-dark-c:hover
 {
     fill: hsl(226, 29%, 17.1%);
     stroke: hsl(226, 29%, 17.1%);
@@ -108,7 +108,7 @@
     stroke: #A61F38;
 }
 
-.btn.svg-high-c :hover
+.btn.svg-high-c:hover
 {
     fill: hsl(349, 69%, 35.1%);
     stroke: hsl(349, 69%, 35.1%);
@@ -337,7 +337,7 @@ hr.now-line{
 }
 
 .delete-self-btn:hover{
-    text-decoration: line-through;
+    text-decoration: line-through 2px;
     background-color: gray;
 }
 

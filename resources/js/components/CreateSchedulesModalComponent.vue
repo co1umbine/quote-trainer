@@ -18,17 +18,14 @@
                     <div class="mb-3">
                         <div>
                             <label for="tags" class="form-label">タグ</label>
-                            <!-- <input v-show="!viewOnly" name="tags" type="text" list="tags_list" id="tagsInput" class="form-control" placeholder="Type to search..."> -->
-                            <!-- <datalist v-show="!viewOnly" id="tags_list"> -->
-                                <select v-show="!viewOnly" name="tags" id="tagsInput" class="form-control">
-                                    <option hidden>選択してください</option>
-                                    <option v-for="tag in tags" :key="tag" :value="tag">{{ tag }}</option>
-                                </select>
-                            <!-- </datalist> -->
-                        </div>
-                        <div style="height: 45px;">
-                            <button v-for="tag in selectedTags" :key="tag" type="button" @click="deselectTag(tag)" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">{{ tag }}</button>
-                            <!-- <button type="button" @click="() => {}" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">指定中のタグ</button> -->
+                            <div style="height: 45px;">
+                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';' + (viewOnly ? 'pointer-events: none;':'')" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
+                                <!-- <button type="button" @click="() => {}" class="btn btn-sm my-2 ml-2  dark-c bg-themeblue-c btn-rounded delete-self-btn">指定中のタグ</button> -->
+                            </div>
+                            <select v-show="!viewOnly" name="tags" id="tagsInput" class="form-control">
+                                <option hidden>選択してください</option>
+                                <option v-for="tag in tags" :disabled="selectedTags.findIndex(t=>t.id === tag.id) !== -1" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
+                            </select>
                         </div>
                     </div>
 
@@ -71,7 +68,7 @@
                     <!-- <button v-if="this.viewOnly" type="button" @click="" class="btn white-c bg-base-c">削除</button> -->
                     
                     <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
-                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true;}" class="btn ol-dark-c dark-c">キャンセル</button>
+                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true; refresh();}" class="btn ol-dark-c dark-c">キャンセル</button>
                     <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
                     <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? tentativeUpdate() : tentative()}" class="btn white-c bg-base-c">続行</button>
                 </div>
@@ -92,7 +89,7 @@ function paramsSerializer(params) {
             return {
                 nameText: "",
                 targetDate: targetDate,
-                tags: ["タグの例1", "タグの例2", "タグの例3"],
+                tags: [],
                 selectedTags: [],
                 selectedColor: "#A7CBD9",
                 startOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(targetDate.dateObject),
@@ -122,12 +119,36 @@ function paramsSerializer(params) {
             }
         },
         mounted(){
+            this.getTags();
             this.tagApply();
             // 立ち上がるときの処理
-            $('#schedulesModal').on('show.bs.modal', (event) => {
+            $('#schedulesModal').on('show.bs.modal', this.start);
+        },
+        methods:{
+            getTags: function(){
+                axios.get('/api/tags')
+                    .then((res)=>{
+                        tags = res.data;
+                        this.tags = res.data;
+                    });
+            },
+            tagApply: function(){
+                document.getElementById("tagsInput").addEventListener("change", (event) => {
+                    const id = event.target.value;
+                    $("#tagsInput").val("");
+                    // TODO タグを新規に追加する機能？
+                    const index = this.tags.findIndex(t=> t.id == id);
+                    if(index === -1) return;  // 未知の文字列
+                    if(this.selectedTags.findIndex(t=>t.id == id) === -1){  // 重複チェック
+                        this.selectedTags.push(this.tags[index]);
+                    }
+                });
+            },
+            start: function(event){
                 // 入力情報をクリア
                 this.refresh();
                 
+                // 新規作成なら空白のまま
                 if(event.relatedTarget.id === "plusBtn") return;
                 this.viewOnly = true;
                 this.updateMode = true;
@@ -135,7 +156,7 @@ function paramsSerializer(params) {
                 // ボタンを取得
                 const button = $(event.relatedTarget);
 
-                // data-***の部分を取得
+                // data-schedule IDを取得
                 const scheduleId = button.data("schedule");
                 this.srcSchedule = schedules.find(s => s.id === scheduleId);
                 if(typeof this.srcSchedule === "undefined") return;
@@ -148,24 +169,9 @@ function paramsSerializer(params) {
                 const ed = new Date(sd.getTime() + this.srcSchedule.quote);
                 this.endOn = this.dispDateCeilMinute(ed) + "T" + this.dispTimeCeilMinute(ed);
                 this.noteText = this.srcSchedule.note;
-
-                // TODO selectedTags
-            });
-        },
-        methods:{
-            tagApply: function(){
-                document.getElementById("tagsInput").addEventListener("change", (event) => {
-                    const val = event.target.value;
-                    $("#tagsInput").val("");
-                    // TODO タグを新規に追加する機能？
-                    if(!this.tags.includes(val)) return;  // 未知の文字列
-                    if(!this.selectedTags.includes(val)){  // 重複チェック
-                        this.selectedTags.push(val);
-                    }
-                });
+                this.selectedTags = this.srcSchedule.tags;
             },
             refresh: function(){
-                console.log("refresh");
                 this.selectedTags = [];
                 this.nameText = "";
                 if(document.getElementById("tagsInput") !== null) document.getElementById("tagsInput").value = "";
@@ -199,6 +205,7 @@ function paramsSerializer(params) {
                     start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
                     quote: quote,
                     note: this.noteText,
+                    tags: Array.from(this.selectedTags, t => t.id),
                 }
                 axios.post("/api/schedules", schedule)
                     .then((res) => {
@@ -224,6 +231,7 @@ function paramsSerializer(params) {
                     start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
                     quote: quote,
                     note: this.noteText,
+                    tags: Array.from(this.selectedTags, t => t.id),
                 }
                 const index = schedules.indexOf(this.srcSchedule);
                 if(typeof index === -1) return;  // TODO return でいいのか

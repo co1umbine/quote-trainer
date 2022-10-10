@@ -41,6 +41,7 @@
         }
     }
     let schedules = [];
+    let tags = [];
     let keyAcceptance = true;
 
 
