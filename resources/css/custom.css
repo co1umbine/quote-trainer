@@ -266,6 +266,18 @@ hr.now-line{
     margin-top: 0.2rem;
     line-height: 1; 
     padding:0.1rem 0.2rem;
+    overflow: hidden;
+}
+
+.experience-month{
+    text-align: left;
+    display: block;
+    width: 100%;
+    margin-top: 0.2rem;
+    line-height: 1; 
+    padding:0.1rem 0.2rem;
+    opacity: 70%;
+    overflow: hidden;
 }
 
 .schedule-week {
@@ -278,6 +290,19 @@ hr.now-line{
     padding: 0px 2px;
     margin: 2% 2%;
     box-shadow: 0 0 10px 0 rgba(77, 93, 125, 0.5);
+}
+
+.experience-week {
+    position: absolute;
+    text-align: left;
+	align-items: flex-start;
+    display: block;
+    width: 96%;
+    line-height: 1; 
+    padding: 0px 2px;
+    margin: 2% 2%;
+    box-shadow: 0 0 10px 0 rgba(77, 93, 125, 0.5);
+    opacity: 70%;
 }
 
 .top-text{

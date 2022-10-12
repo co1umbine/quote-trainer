@@ -22,12 +22,12 @@
 </template>
 
 <script>
-
     export default {
         data(){
             return {
                 targetDate: targetDate,
                 schedules: schedules,
+                experiences: experiences,
                 weekCount: 5,
             }
         },
@@ -62,6 +62,11 @@
                         schedules = res.data;
                         this.schedules = res.data;
                     });
+                axios.get('/api/experiences')
+                    .then((res)=>{
+                        experiences = res.data;
+                        this.experiences = res.data;
+                    })
             },
             refleshCalendar: function(){
                 const year = this.targetDate.year();
@@ -120,11 +125,19 @@
             },
             refreshSchedules: function(){
                 let scheduleElems = document.getElementsByClassName("schedule-month");
-                const loopCount = scheduleElems.length;
+                let loopCount = scheduleElems.length;
                 for(let i=0; i< loopCount; i++){
                     let s = scheduleElems[scheduleElems.length - 1];
                     if(s){
                         s.parentNode.removeChild(s);
+                    }
+                }
+                let experienceElems = document.getElementsByClassName("experience-month");
+                loopCount = experienceElems.length;
+                for(let i=0; i< loopCount; i++){
+                    let e = experienceElems[experienceElems.length - 1];
+                    if(e){
+                        e.parentNode.removeChild(e);
                     }
                 }
             },
@@ -156,6 +169,32 @@
                     const parent = document.getElementById((startDate.getMonth()+1)+"/"+startDate.getDate()).lastElementChild;
                     parent.appendChild(scheElem);
                 });
+                this.experiences.forEach(e => {
+                    const startDate = new Date(e.start_on);
+                    if(!isInMonthPage(startDate, this.targetDate.month())) return;
+                    
+                    const expElem = document.createElement("button");
+                    expElem.classList.add("btn", "btn-sm", "experience-month");
+                    expElem.textContent = e.name;
+
+                    // 色
+                    expElem.style.background = "#" + e.color;
+                    let blightness = Math.max(parseInt(e.color.slice(0,2), 16), parseInt(e.color.slice(2,4), 16), parseInt(e.color.slice(4), 16));
+                    if(blightness < 8){
+                        expElem.classList.add("white-c");
+                    }else{
+                        expElem.classList.add("dark-c");
+                    }
+
+                    // 詳細ウィンドウ用設定
+                    // data-toggle="modal" data-target="#schedulesModal" data-schedule=id
+                    expElem.setAttribute("data-toggle", "modal");
+                    expElem.setAttribute("data-target", "#experiencesModal");
+                    expElem.setAttribute("data-experience", e.id);
+
+                    const parent = document.getElementById((startDate.getMonth()+1)+"/"+startDate.getDate()).lastElementChild;
+                    parent.appendChild(expElem);
+                });
             }
         },
         watch:{
@@ -169,7 +208,10 @@
             },
             schedules: function(newValue){
                 this.applySchedules();
-            }
+            },
+            experiences: function(newValue){
+                this.applySchedules();
+            },
         }
     }
 </script>

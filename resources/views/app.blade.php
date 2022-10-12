@@ -19,7 +19,8 @@
 <body class="bg-white-c">
 <div id="app" style="height: 100%;">
     <header-component></header-component>
-    <create-modal-component></create-modal-component>
+    <sche-modal-component></sche-modal-component>
+    <exp-modal-component></exp-modal-component>
 
     <router-view></router-view>
 </div>
@@ -41,6 +42,7 @@
         }
     }
     let schedules = [];
+    let experiences = [];
     let tags = [];
     let keyAcceptance = true;
 
