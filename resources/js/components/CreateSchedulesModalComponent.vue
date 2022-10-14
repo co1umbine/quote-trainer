@@ -207,9 +207,11 @@ function paramsSerializer(params) {
                     note: this.noteText,
                     tags: Array.from(this.selectedTags, t => t.id),
                 }
+
+                schedules.push(schedule);
+                $("#schedulesModal").modal("hide");
                 axios.post("/api/schedules", schedule)
                     .then((res) => {
-                        $("#schedulesModal").modal("hide");
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -222,35 +224,41 @@ function paramsSerializer(params) {
 
                 const startOnDate = new Date(this.startOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
-                const quote = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
+                const quoteMS = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
 
                 const schedule= {
                     user_id: 1,
                     name: this.nameText,
                     color: this.selectedColor.slice(-6),
                     start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
-                    quote: quote,
+                    quote: quoteMS,
                     note: this.noteText,
                     tags: Array.from(this.selectedTags, t => t.id),
                 }
                 const index = schedules.indexOf(this.srcSchedule);
+                console.log("index " + index);
                 if(typeof index === -1) return;  // TODO return でいいのか
 
+                schedules[index] = schedule;
+                $("#schedulesModal").modal("hide");
                 axios.put('/api/schedules/' + this.srcSchedule.id, schedule)
                     .then((res) => {
-                        $("#createSchedulesModal").modal("hide");
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
-
             },
             deleteSchedule: function(){
                 const flag = confirm("本当に予定 " +this.srcSchedule.name+ " を削除しますか？");
                 if(!flag) return;
+
+                const index = schedules.indexOf(this.srcSchedule);
+                if(typeof index === -1) return;  // TODO return でいいのか
+
+                schedules.splice(index);
+                $("#schedulesModal").modal("hide");
                 axios.delete('/api/schedules/' + this.srcSchedule.id)
                     .then((res) => {
-                        $("#createSchedulesModal").modal("hide");
                     })
                     .catch(function (error) {
                         console.log(error);

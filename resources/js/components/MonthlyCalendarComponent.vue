@@ -34,10 +34,10 @@
         mounted(){
             this.refleshCalendar();
             this.applyHeight();
-            this.applySchedules();
-            this.getSchedules();
+            this.dispScheExps();
+            this.getScheExps();
             window.addEventListener('resize', this.applyHeight);
-            $('#schedulesModal').on('hidden.bs.modal', this.getSchedules);
+            $('#schedulesModal').on('hidden.bs.modal', this.getScheExps);
         },
         methods:{
             applyHeight: function(){
@@ -56,7 +56,7 @@
                     }
                 }
             },
-            getSchedules: function(){
+            getScheExps: function(){
                 axios.get('/api/schedules')
                     .then((res)=>{
                         schedules = res.data;
@@ -123,7 +123,7 @@
                     }
                 }
             },
-            refreshSchedules: function(){
+            clearScheExps: function(){
                 let scheduleElems = document.getElementsByClassName("schedule-month");
                 let loopCount = scheduleElems.length;
                 for(let i=0; i< loopCount; i++){
@@ -141,8 +141,8 @@
                     }
                 }
             },
-            applySchedules: function(){
-                this.refreshSchedules();
+            dispScheExps: function(){
+                this.clearScheExps();
                 this.schedules.forEach(s => {
                     const startDate = new Date(s.start_on);
                     if(!isInMonthPage(startDate, this.targetDate.month())) return;
@@ -202,15 +202,15 @@
                 handler: function(newValue){
                     this.refleshCalendar();
                     this.applyHeight();
-                    this.applySchedules();
+                    this.dispScheExps();
                 },
                 deep: true
             },
             schedules: function(newValue){
-                this.applySchedules();
+                this.dispScheExps();
             },
             experiences: function(newValue){
-                this.applySchedules();
+                this.dispScheExps();
             },
         }
     }
