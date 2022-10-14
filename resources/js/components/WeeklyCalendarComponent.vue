@@ -32,7 +32,8 @@
             return {
                 targetDate: targetDate,
                 schedules: schedules,
-                schedulesCount: [0, 0, 0, 0, 0, 0, 0],
+                experiences: experiences,
+                scheExpsCount: [0, 0, 0, 0, 0, 0, 0],
             }
         },
         computed:{
@@ -64,12 +65,12 @@
         mounted(){
             this.applyHeight();
             this.currentTimeBar();
-            this.applySchedules();
-            this.getSchedules();
+            this.dispScheExps();
+            this.getScheExps();
             setInterval(function(){this.currentTimeBar();}.bind(this), 120000);  // 2分おきに更新
             window.addEventListener('resize', this.applyHeight());
             $('#schedulesModal').on('hidden.bs.modal', function (event) {
-                this.getSchedules();
+                this.getScheExps();
             });
         },
         methods:{
@@ -95,26 +96,39 @@
                 lineElem.setAttribute("style", "top: "+((nowDate.getMinutes()/60)*100-50).toString() + "%;");
                 nowElem.appendChild(lineElem);
             },
-            getSchedules: function(){
+            getScheExps: function(){
                 axios.get('/api/schedules')
                     .then((res)=>{
                         schedules = res.data;
                         this.schedules = res.data;
                     });
+                axios.get('/api/experiences')
+                    .then((res)=>{
+                        experiences = res.data;
+                        this.experiences = res.data;
+                    });
             },
-            clearSchedules: function(){
-                this.schedulesCount = [0, 0, 0, 0, 0, 0, 0];
+            clearScheExps: function(){
+                this.scheExpsCount = [0, 0, 0, 0, 0, 0, 0];
                 let scheduleElems = document.getElementsByClassName("schedule-week");
-                const loopCount = scheduleElems.length;
+                let loopCount = scheduleElems.length;
                 for(let i=0; i< loopCount; i++){
                     let s = scheduleElems[scheduleElems.length - 1];
                     if(s){
                         s.parentNode.removeChild(s);
                     }
                 }
+                let experienceElems = document.getElementsByClassName("schedule-week");
+                loopCount = experienceElems.length;
+                for(let i=0; i< loopCount; i++){
+                    let s = experienceElems[experienceElems.length - 1];
+                    if(s){
+                        s.parentNode.removeChild(s);
+                    }
+                }
             },
-            applySchedules: function(){
-                this.clearSchedules();
+            dispScheExps: function(){
+                this.clearScheExps();
                 this.schedules.forEach(s => {
                     const startDate = new Date(s.start_on);
                     const quote = new Date(s.quote);
@@ -164,8 +178,8 @@
                             scheElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100*1.04).toString() + "%";
                             
                             // 重なり調整
-                            scheElem.style.zIndex = baseZIndex + this.schedulesCount[dstDate.getDay()];
-                            this.schedulesCount[dstDate.getDay()] += 1;
+                            scheElem.style.zIndex = baseZIndex + this.scheExpsCount[dstDate.getDay()];
+                            this.scheExpsCount[dstDate.getDay()] += 1;
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));
@@ -176,12 +190,87 @@
                             scheElem.style.right = "0%";
 
                             // 重なり調整
-                            scheElem.style.zIndex = baseZIndex + this.schedulesCount[dstDate.getDay()];
-                            scheElem.style.width = 96/(this.schedulesCount[dstDate.getDay()]+1).toString() + "%";
-                            this.schedulesCount[dstDate.getDay()] += 1;
+                            scheElem.style.zIndex = baseZIndex + this.scheExpsCount[dstDate.getDay()];
+                            scheElem.style.width = 96/(this.scheExpsCount[dstDate.getDay()]+1).toString() + "%";
+                            this.scheExpsCount[dstDate.getDay()] += 1;
 
                             const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
                             parent.appendChild(scheElem.cloneNode(true));
+
+                            dstDate.setDate(dstDate.getDate() + 1);
+                            if(dstDate.getDay() === 0) return;
+                            dstStartTime = dstDate;
+                        }
+                    }
+
+                });
+                this.experiences.forEach(e => {
+                    const startDate = new Date(e.start_on);
+                    const quote = new Date(e.quote);
+                    const endDate = new Date(startDate);
+                    endDate.setHours(endDate.getHours()+Math.floor(quote.getTime()/3600000), endDate.getMinutes()+quote.getMinutes());
+
+                    // 同じ週になければ終了次の予定へ，週初めの日付が一致するか判定
+                    if(!isInSameWeek(startDate, this.targetDate.dateObject) && !isInSameWeek(endDate, this.targetDate.dateObject) && !(startDate <= this.targetDate.dateObject && this.targetDate.dateObject <= endDate)) return;
+
+                    // スケジュールオブジェクト
+                    const expElem = document.createElement("button");
+                    expElem.classList.add("btn", "btn-sm", "experience-week");
+                    expElem.style.background = "#" + e.color;
+                    let blightness = Math.max(parseInt(e.color.slice(0,2), 16), parseInt(e.color.slice(2,4), 16), parseInt(e.color.slice(4), 16));
+                    if(blightness < 8){
+                        expElem.classList.add("white-c");
+                    }else{
+                        expElem.classList.add("dark-c");
+                    }
+
+                    // 詳細ウィンドウ用設定
+                    // data-toggle="modal" data-target="#schedulesModal" data-schedule=id
+                    expElem.setAttribute("data-toggle", "modal");
+                    expElem.setAttribute("data-target", "#experiencesModal");
+                    expElem.setAttribute("data-experience", e.id);
+
+
+                    // スケジュールタイトル
+                    const spanElem = document.createElement("span");
+                    spanElem.textContent = e.name;
+                    spanElem.classList.add("top-text");
+                    expElem.appendChild(spanElem);
+                    
+                    // サイズ指定 生成
+                    let dstDate, dstStartTime;  // 複数日に渡るスケジュールでは 予定ボタンの始まりは 元の予定開始時間 → 次の日の0：00 → 次の日の0:00となる
+                    const baseZIndex = 10;
+                    if(isInSameWeek(startDate, this.targetDate.dateObject)){
+                        dstStartTime = new Date(startDate);
+                    }else{ 
+                        dstStartTime = new Date(this.targetDate.dateObject.getFullYear(), this.targetDate.dateObject.getMonth(), this.targetDate.dateObject.getDate()-this.targetDate.dateObject.getDay());
+                    }
+                    dstDate = new Date(dstStartTime);
+                    dstDate.setHours(0, 0, 0, 0);
+                    while(dstDate <= endDate){
+                        if(isSameDate(dstDate, endDate)){  // 予定が現在見てる日で終了する場合
+                            expElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
+                            expElem.style.height = (((endDate.getHours()-dstStartTime.getHours())*60 + endDate.getMinutes()-dstStartTime.getMinutes())/60*100*1.04).toString() + "%";
+                            
+                            // 重なり調整
+                            expElem.style.zIndex = baseZIndex + this.scheExpsCount[dstDate.getDay()];
+                            this.scheExpsCount[dstDate.getDay()] += 1;
+
+                            const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
+                            parent.appendChild(expElem.cloneNode(true));
+                            break;
+                        }else{
+                            expElem.style.top = (dstStartTime.getMinutes()/60*100).toString() +"%";
+                            expElem.style.height = (((23-dstStartTime.getHours())*60 + (60-dstStartTime.getMinutes()))/60*100*1.04).toString() + "%";
+                            expElem.style.right = "0%";
+
+                            // 重なり調整
+                            expElem.style.zIndex = baseZIndex + this.scheExpsCount[dstDate.getDay()];
+                            expElem.style.width = 96/(this.scheExpsCount[dstDate.getDay()]+1).toString() + "%";
+                            this.scheExpsCount[dstDate.getDay()] += 1;
+
+                            const parent = document.getElementById(("0"+dstStartTime.getHours()).slice(-2) + "-" +dstStartTime.getDay());
+                            parent.appendChild(expElem.cloneNode(true));
 
                             dstDate.setDate(dstDate.getDate() + 1);
                             if(dstDate.getDay() === 0) return;
@@ -196,12 +285,15 @@
             targetDate: {
                 handler: function(newValue){
                     this.currentTimeBar();
-                    this.applySchedules();
+                    this.dispScheExps();
                 },
                 deep: true
             },
             schedules: function(newValue){
-                this.applySchedules();
+                this.dispScheExps();
+            },
+            experiences: function(newValue){
+                this.dispScheExps();
             }
         }
     }

@@ -290,6 +290,7 @@ hr.now-line{
     padding: 0px 2px;
     margin: 2% 2%;
     box-shadow: 0 0 10px 0 rgba(77, 93, 125, 0.5);
+    word-break: break-word;
 }
 
 .experience-week {
@@ -303,6 +304,7 @@ hr.now-line{
     margin: 2% 2%;
     box-shadow: 0 0 10px 0 rgba(77, 93, 125, 0.5);
     opacity: 70%;
+    word-break: break-word;
 }
 
 .top-text{
