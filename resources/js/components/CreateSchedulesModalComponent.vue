@@ -1,7 +1,7 @@
 <template>
     <div class="modal" id="schedulesModal" tabindex="-1" aria-labelledby="RegisterSchedule" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div v-if="inputPhase" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="RegisterSchedule">{{viewOnly ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -62,15 +62,38 @@
                         <textarea v-show="!this.viewOnly" type="text" class="form-control" id="scheduleNote" v-model="noteText"></textarea>
                         <div v-show="this.viewOnly">{{ noteText }}</div>
                     </div>
-                    
                 </div>
                 <div class="modal-footer">
                     <!-- <button v-if="this.viewOnly" type="button" @click="" class="btn white-c bg-base-c">削除</button> -->
                     
                     <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
-                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true; refresh();}" class="btn ol-dark-c dark-c">キャンセル</button>
+                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true; setProperty();}" class="btn ol-dark-c dark-c">キャンセル</button>
                     <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
-                    <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? tentativeUpdate() : tentative()}" class="btn white-c bg-base-c">続行</button>
+                    <button v-show="!this.viewOnly" type="button" @click="tentative" class="btn white-c bg-base-c">続行</button>
+                </div>
+            </div>
+
+
+            <div v-if="!inputPhase" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="RegisterSchedule">{{viewOnly ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <div aria-hidden="true">&times;</div>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>近い時間で<b>完了した</b>経験です。</label>
+                    </div>
+                    <div class="mb-3">
+                        <label>近い時間に<b>見積もった</b>経験です。</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" @click="()=>{this.inputPhase = true;}" class="btn ol-dark-c dark-c">戻る</button>
+                    <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? updateSchedule() : registerSchedule()}" class="btn white-c bg-base-c">保存</button>
                 </div>
             </div>
         </div>
@@ -98,6 +121,7 @@ function paramsSerializer(params) {
                 viewOnly: false,
                 updateMode: false,
                 srcSchedule: null,
+                inputPhase: true,
             }
         },
         computed:{
@@ -159,17 +183,9 @@ function paramsSerializer(params) {
                 // data-schedule IDを取得
                 const scheduleId = button.data("schedule");
                 this.srcSchedule = schedules.find(s => s.id === scheduleId);
-                if(typeof this.srcSchedule === "undefined") return;
                 
                 // データ表示
-                this.nameText = this.srcSchedule.name;
-                this.selectedColor = "#"+this.srcSchedule.color;
-                const sd = new Date(this.srcSchedule.start_on);
-                this.startOn = this.dispDateCeilMinute(sd) + "T" + this.dispTimeCeilMinute(sd);
-                const ed = new Date(sd.getTime() + this.srcSchedule.quote);
-                this.endOn = this.dispDateCeilMinute(ed) + "T" + this.dispTimeCeilMinute(ed);
-                this.noteText = this.srcSchedule.note;
-                this.selectedTags = this.srcSchedule.tags;
+                this.setProperty();
             },
             refresh: function(){
                 this.selectedTags = [];
@@ -184,6 +200,19 @@ function paramsSerializer(params) {
                 this.viewOnly = false;
                 this.updateMode = false;
                 this.srcSchedule = null;
+                this.inputPhase = true;
+            },
+            setProperty: function(){
+                if(typeof this.srcSchedule === "undefined") return;
+
+                this.nameText = this.srcSchedule.name;
+                this.selectedColor = "#"+this.srcSchedule.color;
+                const sd = new Date(this.srcSchedule.start_on);
+                this.startOn = this.dispDateCeilMinute(sd) + "T" + this.dispTimeCeilMinute(sd);
+                const ed = new Date(sd.getTime() + this.srcSchedule.quote);
+                this.endOn = this.dispDateCeilMinute(ed) + "T" + this.dispTimeCeilMinute(ed);
+                this.noteText = this.srcSchedule.note;
+                this.selectedTags = Array.from(this.srcSchedule.tags);
             },
             deselectTag: function(tag){
                 if(!this.selectedTags.includes(tag)) return;
@@ -193,6 +222,9 @@ function paramsSerializer(params) {
                 if(this.nameText === "") {
                     this.nameText = "（スケジュール名なし）";
                 }
+                this.inputPhase = false;
+            },
+            registerSchedule: function(){
 
                 const startOnDate = new Date(this.startOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
@@ -217,10 +249,7 @@ function paramsSerializer(params) {
                         console.log(error);
                     });
             },
-            tentativeUpdate: function(){
-                if(this.nameText === "") {
-                    this.nameText = "（スケジュール名なし）";
-                }
+            updateSchedule: function(){
 
                 const startOnDate = new Date(this.startOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
@@ -236,7 +265,6 @@ function paramsSerializer(params) {
                     tags: Array.from(this.selectedTags, t => t.id),
                 }
                 const index = schedules.indexOf(this.srcSchedule);
-                console.log("index " + index);
                 if(typeof index === -1) return;  // TODO return でいいのか
 
                 schedules[index] = schedule;

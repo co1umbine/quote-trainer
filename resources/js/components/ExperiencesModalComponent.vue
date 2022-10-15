@@ -166,18 +166,7 @@ function paramsSerializer(params) {
                 if(typeof this.srcExperience === "undefined") return;
                 
                 // データ表示
-                this.nameText = this.srcExperience.name;
-                this.selectedColor = "#"+this.srcExperience.color;
-                const sd = new Date(this.srcExperience.start_on);
-                this.startOn = this.dispDateCeilMinute(sd) + "T" + this.dispTimeCeilMinute(sd);
-                const ed = new Date(sd.getTime() + this.srcExperience.quote);
-                this.endOn = this.dispDateCeilMinute(ed) + "T" + this.dispTimeCeilMinute(ed);
-                
-                this.quote = (this.srcExperience.quote > 8.64e+7 ? Math.floor(this.srcExperience.quote / 8.64e+7) +"日 " : "") + ("0" + Math.floor((this.srcExperience.quote % 8.64e+7)/3.6e+6)).slice(-2) +":"+ ("0" + Math.floor((this.srcExperience.quote % 3.6e+6)/60000)).slice(-2);
-                this.noteText = this.srcExperience.note;
-                this.selectedTags = this.srcExperience.tags;
-
-                this.efficiency = this.srcExperience.efficiency;
+                this.setProperty();
             },
             refresh: function(){
                 this.selectedTags = [];
@@ -191,6 +180,20 @@ function paramsSerializer(params) {
                 
                 this.viewOnly = false;
                 this.srcExperience = null;
+            },
+            setProperty: function(){
+                this.nameText = this.srcExperience.name;
+                this.selectedColor = "#"+this.srcExperience.color;
+                const sd = new Date(this.srcExperience.start_on);
+                this.startOn = this.dispDateCeilMinute(sd) + "T" + this.dispTimeCeilMinute(sd);
+                const ed = new Date(sd.getTime() + this.srcExperience.quote);
+                this.endOn = this.dispDateCeilMinute(ed) + "T" + this.dispTimeCeilMinute(ed);
+                
+                this.quote = (this.srcExperience.quote > 8.64e+7 ? Math.floor(this.srcExperience.quote / 8.64e+7) +"日 " : "") + ("0" + Math.floor((this.srcExperience.quote % 8.64e+7)/3.6e+6)).slice(-2) +":"+ ("0" + Math.floor((this.srcExperience.quote % 3.6e+6)/60000)).slice(-2);
+                this.noteText = this.srcExperience.note;
+                this.selectedTags = Array.from(this.srcExperience.tags);
+
+                this.efficiency = this.srcExperience.efficiency;
             },
             deselectTag: function(tag){
                 if(!this.selectedTags.includes(tag)) return;
