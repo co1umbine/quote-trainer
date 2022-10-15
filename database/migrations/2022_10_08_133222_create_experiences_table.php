@@ -24,7 +24,7 @@ class CreateExperiencesTable extends Migration
             $table->unsignedbigInteger('quote', $precision = 0);
             $table->unsignedbigInteger('period', $precision = 0);
             $table->tinyInteger('efficiency');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }

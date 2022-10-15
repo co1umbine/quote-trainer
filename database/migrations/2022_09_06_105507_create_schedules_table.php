@@ -19,8 +19,8 @@ class CreateSchedulesTable extends Migration
             $table->string('name', 100);
             $table->char('color', 6);
             $table->timestampTz('start_on', $precision=0);
-            $table->unsignedbigInteger('quote', $precision = 0);
-            $table->text('note');
+            $table->unsignedbigInteger('quote', $precision=0);
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }
