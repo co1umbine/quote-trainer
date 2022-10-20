@@ -10,8 +10,36 @@ class ExperienceController extends Controller
     public function index(){
         return Experience::with('tags')->get();
     }
+    public function showQuoteInRange(float $min, float $max){
+        return Experience::with('tags')
+            ->whereBetween('quote', [$min, $max])
+            ->get();
+    }
+    public function showPeriodInRange(float $min, float $max){
+        return Experience::with('tags')
+            ->whereBetween('period', [$min, $max])
+            ->get();
+    }
+    public function showInPeriod(string $start, string $end){
+        return Experience::with('tags')
+            ->whereDay('end_on', '>=', $start)
+            ->whereDay('start_on', '<=', $end)
+            ->get();
+    }
     public function store(Request $request){
-        $params = $request->only(['user_id','schedule_id','name','color','start_on','end_on','quote','period','efficiency','note']);
+        $params = $request
+            ->only([
+                'user_id',
+                'schedule_id',
+                'name',
+                'color',
+                'start_on',
+                'end_on',
+                'quote',
+                'period',
+                'efficiency',
+                'note'
+            ]);
         //TODO バリデーション
         $experience = Experience::create($params);
 
@@ -23,7 +51,19 @@ class ExperienceController extends Controller
         return $experience;
     }
     public function update(Request $request, Experience $experience){
-        $params = $request->only(['user_id','schedule_id','name','color','start_on','end_on','quote','period','efficiency','note']);
+        $params = $request
+            ->only([
+                'user_id',
+                'schedule_id',
+                'name',
+                'color',
+                'start_on',
+                'end_on',
+                'quote',
+                'period',
+                'efficiency',
+                'note'
+            ]);
         //TODO バリデーション
         $experience->update($params);
         
