@@ -371,3 +371,30 @@ hr.now-line{
 .rounded-corner{
     border-radius: 20px;
 }
+.rounded-corner-sm{
+    border-radius: 5px;
+}
+
+.exp-bar-container{
+	align-items: flex-start;
+}
+
+hr.bar-base-line{
+    position: relative;
+    top: -0.5rem;
+    border: none;
+    border-top: 2px solid gray;
+    opacity: 30%;
+    margin: 0px;
+}
+
+.exp-compare-bar{
+    position: relative;
+    text-align: left;
+    display: block;
+    padding: 0 0.5rem;
+    margin: 0.5rem 0;
+    overflow-x: hidden;
+    box-shadow: 0 0 5px 0 rgba(77, 93, 125, 0.5);
+    z-index: 10;
+}

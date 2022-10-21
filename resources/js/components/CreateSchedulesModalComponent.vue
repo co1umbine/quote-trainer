@@ -85,9 +85,22 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label>近い時間で<b>完了した</b>経験です。</label>
+                        <div  v-for="ex in simPeriodExp" :key="ex.id">
+                            <div class="rounded-corner-sm exp-compare-bar" :style="'background:#'+ex.color+'; width: '+ 50*(ex.quote/quoteMilliSec)+'%'">
+                                {{ ex.name }}
+                                <!-- <span>ex.period</span> -->
+                            </div>
+                            <hr class="bar-base-line"/>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label>近い時間に<b>見積もった</b>経験です。</label>
+                        <div  v-for="ex in simQuoteExp" :key="ex.id">
+                            <div class="rounded-corner-sm exp-compare-bar" :style="'background:#'+ex.color+'; width: '+ 50*(ex.period/quoteMilliSec)+'%'">
+                                {{ ex.name }}
+                            </div>
+                            <hr class="bar-base-line"/>
+                        </div>
                     </div>
                 </div>
 
@@ -122,6 +135,8 @@ function paramsSerializer(params) {
                 updateMode: false,
                 srcSchedule: null,
                 inputPhase: true,
+                simQuoteExp: [],
+                simPeriodExp: [],
             }
         },
         computed:{
@@ -140,6 +155,9 @@ function paramsSerializer(params) {
                         return this.dispPeriodTime(quote);
                     }
                 }
+            },
+            quoteMilliSec: function(){
+                return new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
             }
         },
         mounted(){
@@ -222,20 +240,62 @@ function paramsSerializer(params) {
                 if(this.nameText === "") {
                     this.nameText = "（スケジュール名なし）";
                 }
+                const quoteMS = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
+                const radius = this.quoteMilliSec*0.5;
+                axios.get('/api/experiences/quoteInRange/'+(this.quoteMilliSec/2).toString()+'/'+(this.quoteMilliSec*2).toString())
+                    .then((res)=>{
+                        this.simQuoteExp = res.data;
+                        this.simQuoteExp.sort((a,b)=>{
+                            if(a.quote > b.quote) return -1;
+                            if(a.quote < b.quote) return 1;
+                            return 0;
+                        });
+                        if(this.simQuoteExp.length > 6){
+                            const newArray = [];
+                            const radius = this.simQuoteExp.length/2;
+                            for(let i=1; i<=3; ++i){
+                                let left = 0+(i*radius/3.5);
+                                newArray.push(this.simQuoteExp[left]);
+                                let right = this.simQuoteExp.length-1-(i*radius/3.5);
+                                newArray.push(this.simQuoteExp[right]);
+                            }
+                            this.simQuoteExp = newArray;
+                        }
+                    });
+                axios.get('/api/experiences/periodInRange/'+(this.quoteMilliSec/2).toString()+'/'+(this.quoteMilliSec*2).toString())
+                    .then((res)=>{
+                        this.simPeriodExp = res.data;
+                        this.simPeriodExp.sort((a,b)=>{
+                            if(a.period > b.period) return -1;
+                            if(a.period < b.period) return 1;
+                            return 0;
+                        });
+                        if(this.simPeriodExp.length > 6){
+                            const newArray = [];
+                            const radius = this.simPeriodExp.length/2;
+                            for(let i=1; i<=3; ++i){
+                                let left = 0+(i*radius/3.5);
+                                newArray.push(this.simPeriodExp[left]);
+                                let right = this.simPeriodExp.length-1-(i*radius/3.5);
+                                newArray.push(this.simPeriodExp[right]);
+                            }
+                            this.simPeriodExp = newArray;
+                        }
+                    });
                 this.inputPhase = false;
             },
             registerSchedule: function(){
 
                 const startOnDate = new Date(this.startOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
-                const quote = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
+                // const quoteMS = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
 
                 const schedule= {
                     user_id: 1,
                     name: this.nameText,
                     color: this.selectedColor.slice(-6),
                     start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
-                    quote: quote,
+                    quote: this.quoteMilliSec,
                     note: this.noteText,
                     tags: Array.from(this.selectedTags, t => t.id),
                 }
@@ -253,14 +313,14 @@ function paramsSerializer(params) {
 
                 const startOnDate = new Date(this.startOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
-                const quoteMS = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
+                // const quoteMS = new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
 
                 const schedule= {
                     user_id: 1,
                     name: this.nameText,
                     color: this.selectedColor.slice(-6),
                     start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
-                    quote: quoteMS,
+                    quote: this.quoteMilliSec,
                     note: this.noteText,
                     tags: Array.from(this.selectedTags, t => t.id),
                 }
