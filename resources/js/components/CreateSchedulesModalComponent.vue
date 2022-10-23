@@ -248,6 +248,9 @@ export default {
             this.updateMode = false;
             this.srcSchedule = null;
             this.inputPhase = true;
+            this.simQuoteExp = [];
+            this.simPeriodExp = [];
+            this.pivotQuote = 0;
         },
         setProperty: function () {
             if (typeof this.srcSchedule === "undefined")
@@ -293,10 +296,10 @@ export default {
                         let left = 0 + (i * Math.floor(radius / 3));
                         let right = this.simQuoteExp.length - 1 - (i * Math.floor(radius / 3));
                         if (this.simQuoteExp[right].quote > this.quoteMilliSec) {
-                            dstScheIndex = right;
+                            dstScheIndex = right+1;
                         }
                         else if (this.simQuoteExp[left].quote > this.quoteMilliSec) {
-                            dstScheIndex = left;
+                            dstScheIndex = left+1;
                         }
                         newArray.splice(newArray.length / 2, 0, this.simQuoteExp[left], this.simQuoteExp[right]);
                     }
@@ -310,9 +313,9 @@ export default {
                 if (this.simPeriodExp.length === 0)
                     return;
                 this.simPeriodExp.sort((a, b) => {
-                    if (a.period > b.period)
+                    if (this.periodOrQuote(a) > this.periodOrQuote(b))
                         return -1;
-                    if (a.period < b.period)
+                    if (this.periodOrQuote(a) < this.periodOrQuote(b))
                         return 1;
                     return 0;
                 });
@@ -324,10 +327,10 @@ export default {
                         let left = 0 + (i * Math.floor(radius / 3));
                         let right = this.simPeriodExp.length - 1 - (i * Math.floor(radius / 3));
                         if (this.simPeriodExp[right].period > this.quoteMilliSec) {
-                            dstScheIndex = right;
+                            dstScheIndex = right+1;
                         }
                         else if (this.simPeriodExp[left].period > this.quoteMilliSec) {
-                            dstScheIndex = left;
+                            dstScheIndex = left+1;
                         }
                         newArray.splice(newArray.length / 2, 0, this.simPeriodExp[left], this.simPeriodExp[right]);
                     }
