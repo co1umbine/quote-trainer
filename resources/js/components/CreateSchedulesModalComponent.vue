@@ -235,7 +235,6 @@ export default {
             this.setProperty();
         },
         refresh: function () {
-            console.log("refresh");
             this.selectedTags = [];
             this.nameText = "";
             if (document.getElementById("tagsInput") !== null)
@@ -251,7 +250,6 @@ export default {
             this.inputPhase = true;
             this.simQuoteExp = [];
             this.simPeriodExp = [];
-            console.dir(this.simQuoteExp);
             this.pivotQuote = 0;
         },
         setProperty: function () {
@@ -276,6 +274,8 @@ export default {
                 this.nameText = "（スケジュール名なし）";
             }
             this.pivotQuote = this.quoteMilliSec;
+            this.simQuoteExp = [];
+            this.simPeriodExp = [];
             
             this.srcSchedule = this.createSchedule();
             axios.get("/api/experiences/quoteInRange/" + (this.quoteMilliSec / 2).toString() + "/" + (this.quoteMilliSec * 2).toString())
