@@ -235,6 +235,7 @@ export default {
             this.setProperty();
         },
         refresh: function () {
+            console.log("refresh");
             this.selectedTags = [];
             this.nameText = "";
             if (document.getElementById("tagsInput") !== null)
@@ -250,6 +251,7 @@ export default {
             this.inputPhase = true;
             this.simQuoteExp = [];
             this.simPeriodExp = [];
+            console.dir(this.simQuoteExp);
             this.pivotQuote = 0;
         },
         setProperty: function () {
@@ -281,14 +283,16 @@ export default {
                 this.simQuoteExp = res.data;
                 if (this.simQuoteExp.length === 0)
                     return;
-                this.simQuoteExp.sort((a, b) => {
-                    if (a.quote > b.quote)
-                        return -1;
-                    if (a.quote < b.quote)
-                        return 1;
-                    return 0;
-                });
+                
                 if (this.simQuoteExp.length > 6) {
+                    this.simQuoteExp.sort((a, b) => {
+                        if (a.quote > b.quote)
+                            return -1;
+                        if (a.quote < b.quote)
+                            return 1;
+                        return 0;
+                    });
+
                     const newArray = [];
                     const radius = this.simQuoteExp.length / 2;
                     let dstScheIndex = 6;
@@ -305,6 +309,15 @@ export default {
                     }
                     newArray.splice(dstScheIndex, 0, this.srcSchedule);
                     this.simQuoteExp = newArray;
+                }else{
+                    this.simQuoteExp.push(this.srcSchedule);
+                    this.simQuoteExp.sort((a, b) => {
+                        if (a.quote > b.quote)
+                            return -1;
+                        if (a.quote < b.quote)
+                            return 1;
+                        return 0;
+                    });
                 }
             });
             axios.get("/api/experiences/periodInRange/" + (this.quoteMilliSec / 2).toString() + "/" + (this.quoteMilliSec * 2).toString())
@@ -312,14 +325,16 @@ export default {
                 this.simPeriodExp = res.data;
                 if (this.simPeriodExp.length === 0)
                     return;
-                this.simPeriodExp.sort((a, b) => {
-                    if (this.periodOrQuote(a) > this.periodOrQuote(b))
-                        return -1;
-                    if (this.periodOrQuote(a) < this.periodOrQuote(b))
-                        return 1;
-                    return 0;
-                });
+                
                 if (this.simPeriodExp.length > 6) {
+                    this.simPeriodExp.sort((a, b) => {
+                        if (this.periodOrQuote(a) > this.periodOrQuote(b))
+                            return -1;
+                        if (this.periodOrQuote(a) < this.periodOrQuote(b))
+                            return 1;
+                        return 0;
+                    });
+
                     const newArray = [];
                     const radius = this.simPeriodExp.length / 2;
                     let dstScheIndex = 6;
@@ -336,6 +351,15 @@ export default {
                     }
                     newArray.splice(dstScheIndex, 0, this.srcSchedule);
                     this.simPeriodExp = newArray;
+                }else{
+                    this.simPeriodExp.push(this.srcSchedule);
+                    this.simPeriodExp.sort((a, b) => {
+                        if (this.periodOrQuote(a) > this.periodOrQuote(b))
+                            return -1;
+                        if (this.periodOrQuote(a) < this.periodOrQuote(b))
+                            return 1;
+                        return 0;
+                    });
                 }
             });
             this.inputPhase = false;
