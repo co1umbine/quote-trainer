@@ -394,6 +394,27 @@ hr.now-line{
 .flex-box{
     display: flex;
 }
+.fb-between{
+    justify-content: space-between;
+}
+.fb-start{
+    justify-content: flex-start;
+}
+.fb-end{
+    justify-content: flex-end;
+}
+.fb-top{
+    align-items: flex-start;
+}
+.fb-bottom{
+    align-items: flex-end;
+}
+.fb-center{
+    align-items: center;
+}
+.fb-baseline{
+    align-items: baseline;
+}
 
 .exp-compare-bar{
     position: relative;

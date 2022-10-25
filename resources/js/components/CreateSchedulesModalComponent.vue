@@ -2,8 +2,9 @@
     <div class="modal" id="schedulesModal" tabindex="-1" aria-labelledby="RegisterSchedule" aria-hidden="true">
         <div class="modal-dialog">
             <div v-if="this.phase===0 || this.phase===1" class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header fb-center">
                     <h5 class="modal-title" id="RegisterSchedule">{{this.phase===1 ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
+                    <button v-show="this.phase===1" type="button" @click="() => {this.phase=3}" class="btn white-c bg-base-c mx-2 py-1">完了登録</button>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <div aria-hidden="true">&times;</div>
                     </button>
@@ -19,8 +20,7 @@
                         <div>
                             <label for="tags" class="form-label">タグ</label>
                             <div class="tag-area">
-                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerApply()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
-                                <!-- <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';' + (this.phase===1 ? 'pointer-events: none;':'')" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button> -->
+                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerStyle()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
                                 <div v-if="selectedTags.length === 0" class="silent-text" >タグは設定されていません</div>
                             </div>
                             <select v-show="this.phase===0" name="tags" id="tagsInput" class="form-control">
@@ -66,10 +66,10 @@
                 </div>
                 <div class="modal-footer">
                     
-                    <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
-                    <button v-show="this.phase===0 && this.updateMode" type="button" @click="()=>{this.phase = 1; setProperty();}" class="btn ol-dark-c dark-c">キャンセル</button>
-                    <button v-show="this.phase===1" type="button" @click="()=>{this.phase = 0;}" class="btn white-c bg-base-c">編集</button>
-                    <button v-show="this.phase===0" type="button" @click="tentative" class="btn white-c bg-base-c">続行</button>
+                    <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c mx-2">削除</button>
+                    <button v-show="this.phase===0 && this.updateMode" type="button" @click="()=>{this.phase = 1; setProperty();}" class="btn ol-dark-c dark-c mx-2">キャンセル</button>
+                    <button v-show="this.phase===1" type="button" @click="()=>{this.phase = 0;}" class="btn white-c bg-base-c mx-2">編集</button>
+                    <button v-show="this.phase===0" type="button" @click="tentative" class="btn white-c bg-base-c mx-2">続行</button>
                 </div>
             </div>
 
@@ -91,7 +91,7 @@
                     <div class="mb-3">
                         <label for="simPeriod" class="form-label">近い時間で<b>完了した</b>経験です。</label>
                         <div v-for="ex in simPeriodExp" :key="ex.id" id="simPeriod">
-                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === srcSchedule.id ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*((ex.id === srcSchedule.id ? ex.quote : ex.period)/pivotQuote)+'%'">
+                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === -1 ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*((ex.id === srcSchedule.id ? ex.quote : ex.period)/pivotQuote)+'%'">
                                 <div>{{ ex.name }}</div> <div class="silent-text"> {{dispQuoteDate(new Date(ex.id === srcSchedule.id ? ex.quote : ex.period)) }}</div>
                             </div>
                             <hr class="bar-base-line"/>
@@ -101,7 +101,7 @@
                     <div class="mb-3">
                         <label for="simQuote" class="form-label">近い時間に<b>見積もった</b>経験です。</label>
                         <div  v-for="ex in simQuoteExp" :key="ex.id" id="simQuote">
-                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === srcSchedule.id ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*(ex.quote/pivotQuote)+'%'">
+                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === -1 ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*(ex.quote/pivotQuote)+'%'">
                                 <div>{{ ex.name }}</div>  <div class="silent-text">{{ dispQuoteDate(new Date(ex.quote)) }}</div>
                             </div>
                             <hr class="bar-base-line"/>
@@ -111,8 +111,26 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" @click="()=>{this.phase = 0;}" class="btn ol-dark-c dark-c">戻る</button>
-                    <button v-show="this.phase===2" type="button" @click="()=>{this.updateMode ? updateSchedule() : registerSchedule()}" class="btn white-c bg-base-c">保存</button>
+                    <button type="button" @click="()=>{this.phase = 0;}" class="btn ol-dark-c dark-c mx-2">戻る</button>
+                    <button v-show="this.phase===2" type="button" @click="()=>{this.updateMode ? updateSchedule() : registerSchedule()}" class="btn white-c bg-base-c mx-2">保存</button>
+                </div>
+            </div>
+
+
+            <div v-if="this.phase===3" class="modal-content">
+                
+                <div class="modal-header fb-center">
+                    <h5 class="modal-title" id="CompleteSchedule">スケジュール完了</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <div aria-hidden="true">&times;</div>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" @click="()=>{this.phase = 1; setProperty();}" class="btn ol-dark-c dark-c mx-2">キャンセル</button>
+                    <button type="button" @click="complete" class="btn white-c bg-base-c mx-2">登録</button>
                 </div>
             </div>
         </div>
@@ -136,20 +154,26 @@ return qs.stringify(params);
 export default {
     data() {
         return {
-            nameText: "",
             targetDate: targetDate,
+            
+            nameText: "",
             tags: [],
             selectedTags: [],
             selectedColor: "#A7CBD9",
             startOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(targetDate.dateObject),
             endOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(new Date(targetDate.dateObject.setHours(targetDate.dateObject.getHours() + 1))),
             noteText: "",
+
             phase: 0,
             updateMode: false,
             srcSchedule: null,
+
             simQuoteExp: [],
             simPeriodExp: [],
             pivotQuote: 0,
+
+            periodEndOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(targetDate.dateObject),
+            efficiency: 0,
         };
     },
     computed: {
@@ -189,7 +213,7 @@ export default {
                 this.tags = res.data;
             });
         },
-        tagPointerApply: function(){
+        tagPointerStyle: function(){
             if(typeof this.phase === "undefined"){
                 return  'pointer-events: none;';
             }else{
@@ -209,27 +233,10 @@ export default {
                 }
             });
         },
-        quoteTune: function(event){
-            const slideMS = event.target.value;
-            const s = new Date(this.startOn);
-            const newEndDate = new Date(s.getTime() + Number(slideMS));
-            this.endOn = this.dispDateCeilMinute(newEndDate) + "T" + this.dispTimeCeilMinute(newEndDate);
-            this.simPeriodExp.find(e => e.id === this.srcSchedule.id).quote = Number(slideMS);
-            this.simQuoteExp.find(e => e.id === this.srcSchedule.id).quote = Number(slideMS);
-            this.simPeriodExp.sort((a, b) => {
-                if (this.periodOrQuote(a) > this.periodOrQuote(b))
-                    return -1;
-                if (this.periodOrQuote(a) < this.periodOrQuote(b))
-                    return 1;
-                return 0;
-            });
-            this.simQuoteExp.sort((a, b) => {
-                if (a.quote > b.quote)
-                    return -1;
-                if (a.quote < b.quote)
-                    return 1;
-                return 0;
-            });
+        deselectTag: function (tag) {
+            if (!this.selectedTags.includes(tag))
+                return;
+            this.selectedTags = this.selectedTags.filter(n => n !== tag);
         },
         start: function (event) {
             // 入力情報をクリア
@@ -248,6 +255,8 @@ export default {
             // データ表示
             this.setProperty();
         },
+
+        // 初期化
         refresh: function () {
             this.selectedTags = [];
             this.nameText = "";
@@ -264,9 +273,12 @@ export default {
             this.simQuoteExp = [];
             this.simPeriodExp = [];
             this.pivotQuote = 0;
+            this.periodEndOn = this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(targetDate.dateObject)
         },
+
+        // srcSchedule よりデータ欄を埋める
         setProperty: function () {
-            if (typeof this.srcSchedule === "undefined")
+            if (typeof this.srcSchedule === "undefined" || this.srcSchedule === null)
                 return;
             this.nameText = this.srcSchedule.name;
             this.selectedColor = "#" + this.srcSchedule.color;
@@ -277,11 +289,8 @@ export default {
             this.noteText = this.srcSchedule.note;
             this.selectedTags = Array.from(this.srcSchedule.tags);
         },
-        deselectTag: function (tag) {
-            if (!this.selectedTags.includes(tag))
-                return;
-            this.selectedTags = this.selectedTags.filter(n => n !== tag);
-        },
+        
+        // quote tune画面 類似経験取得
         tentative: function () {
             if (this.nameText === "") {
                 this.nameText = "（スケジュール名なし）";
@@ -290,98 +299,131 @@ export default {
             this.simQuoteExp = [];
             this.simPeriodExp = [];
             
-            this.srcSchedule = this.createSchedule();
+            const tentativeSchedule = this.createSchedule(-1);
+
+            // 類似見積もり経験取得
             axios.get("/api/experiences/quoteInRange/" + (this.quoteMilliSec / 2).toString() + "/" + (this.quoteMilliSec * 2).toString())
                 .then((res) => {
-                this.simQuoteExp = res.data;
-                if (this.simQuoteExp.length === 0)
-                    return;
+                    this.simQuoteExp = res.data;
+                    if (this.simQuoteExp.length === 0)
+                        return;
                 
-                if (this.simQuoteExp.length > 6) {
-                    this.simQuoteExp.sort((a, b) => {
-                        if (a.quote > b.quote)
-                            return -1;
-                        if (a.quote < b.quote)
-                            return 1;
-                        return 0;
-                    });
+                    // 表示経験は6以下
+                    if (this.simQuoteExp.length > 6) {  // 6つオーバー ソート->6つに絞る->予定を追加
+                        this.simQuoteExp.sort((a, b) => {
+                            if (a.quote > b.quote)
+                                return -1;
+                            if (a.quote < b.quote)
+                                return 1;
+                            return 0;
+                        });
 
-                    const newArray = [];
-                    const radius = this.simQuoteExp.length / 2;
-                    let dstScheIndex = 6;
-                    for (let i = 0; i < 3; ++i) {
-                        let left = 0 + (i * Math.floor(radius / 3));
-                        let right = this.simQuoteExp.length - 1 - (i * Math.floor(radius / 3));
-                        if (this.simQuoteExp[right].quote > this.quoteMilliSec) {
-                            dstScheIndex = right+1;
+                        const newArray = [];
+                        const radius = this.simQuoteExp.length / 2;
+                        let dstScheIndex = 6;
+                        for (let i = 0; i < 3; ++i) {
+                            let left = 0 + (i * Math.floor(radius / 3));
+                            let right = this.simQuoteExp.length - 1 - (i * Math.floor(radius / 3));
+                            if (this.simQuoteExp[right].quote > this.quoteMilliSec) {
+                                dstScheIndex = right+1;
+                            }
+                            else if (this.simQuoteExp[left].quote > this.quoteMilliSec) {
+                                dstScheIndex = left+1;
+                            }
+                            newArray.splice(newArray.length / 2, 0, this.simQuoteExp[left], this.simQuoteExp[right]);
                         }
-                        else if (this.simQuoteExp[left].quote > this.quoteMilliSec) {
-                            dstScheIndex = left+1;
-                        }
-                        newArray.splice(newArray.length / 2, 0, this.simQuoteExp[left], this.simQuoteExp[right]);
+                        newArray.splice(dstScheIndex, 0, tentativeSchedule);
+                        this.simQuoteExp = newArray;
+
+                    }else{  // 6つ未満 予定追加->ソート
+                        this.simQuoteExp.push(tentativeSchedule);
+                        this.simQuoteExp.sort((a, b) => {
+                            if (a.quote > b.quote)
+                                return -1;
+                            if (a.quote < b.quote)
+                                return 1;
+                            return 0;
+                        });
                     }
-                    newArray.splice(dstScheIndex, 0, this.srcSchedule);
-                    this.simQuoteExp = newArray;
-                }else{
-                    this.simQuoteExp.push(this.srcSchedule);
-                    this.simQuoteExp.sort((a, b) => {
-                        if (a.quote > b.quote)
-                            return -1;
-                        if (a.quote < b.quote)
-                            return 1;
-                        return 0;
-                    });
-                }
-            });
+                });
+
+            // 類似完了経験取得
             axios.get("/api/experiences/periodInRange/" + (this.quoteMilliSec / 2).toString() + "/" + (this.quoteMilliSec * 2).toString())
                 .then((res) => {
-                this.simPeriodExp = res.data;
-                if (this.simPeriodExp.length === 0)
-                    return;
-                
-                if (this.simPeriodExp.length > 6) {
-                    this.simPeriodExp.sort((a, b) => {
-                        if (this.periodOrQuote(a) > this.periodOrQuote(b))
-                            return -1;
-                        if (this.periodOrQuote(a) < this.periodOrQuote(b))
-                            return 1;
-                        return 0;
-                    });
+                    this.simPeriodExp = res.data;
+                    if (this.simPeriodExp.length === 0)
+                        return;
+                    
+                    // 表示経験は6以下
+                    if (this.simPeriodExp.length > 6) {  // 6つオーバー ソート->6つに絞る->予定を追加
+                        this.simPeriodExp.sort((a, b) => {
+                            if (this.periodOrQuote(a) > this.periodOrQuote(b))
+                                return -1;
+                            if (this.periodOrQuote(a) < this.periodOrQuote(b))
+                                return 1;
+                            return 0;
+                        });
 
-                    const newArray = [];
-                    const radius = this.simPeriodExp.length / 2;
-                    let dstScheIndex = 6;
-                    for (let i = 0; i < 3; ++i) {
-                        let left = 0 + (i * Math.floor(radius / 3));
-                        let right = this.simPeriodExp.length - 1 - (i * Math.floor(radius / 3));
-                        if (this.simPeriodExp[right].period > this.quoteMilliSec) {
-                            dstScheIndex = right+1;
+                        const newArray = [];
+                        const radius = this.simPeriodExp.length / 2;
+                        let dstScheIndex = 6;
+                        for (let i = 0; i < 3; ++i) {
+                            let left = 0 + (i * Math.floor(radius / 3));
+                            let right = this.simPeriodExp.length - 1 - (i * Math.floor(radius / 3));
+                            if (this.simPeriodExp[right].period > this.quoteMilliSec) {
+                                dstScheIndex = right+1;
+                            }
+                            else if (this.simPeriodExp[left].period > this.quoteMilliSec) {
+                                dstScheIndex = left+1;
+                            }
+                            newArray.splice(newArray.length / 2, 0, this.simPeriodExp[left], this.simPeriodExp[right]);
                         }
-                        else if (this.simPeriodExp[left].period > this.quoteMilliSec) {
-                            dstScheIndex = left+1;
-                        }
-                        newArray.splice(newArray.length / 2, 0, this.simPeriodExp[left], this.simPeriodExp[right]);
+                        newArray.splice(dstScheIndex, 0, tentativeSchedule);
+                        this.simPeriodExp = newArray;
+
+                    }else{  // 6つ以下 予定追加->ソート
+                        this.simPeriodExp.push(tentativeSchedule);
+                        this.simPeriodExp.sort((a, b) => {
+                            if (this.periodOrQuote(a) > this.periodOrQuote(b))
+                                return -1;
+                            if (this.periodOrQuote(a) < this.periodOrQuote(b))
+                                return 1;
+                            return 0;
+                        });
                     }
-                    newArray.splice(dstScheIndex, 0, this.srcSchedule);
-                    this.simPeriodExp = newArray;
-                }else{
-                    this.simPeriodExp.push(this.srcSchedule);
-                    this.simPeriodExp.sort((a, b) => {
-                        if (this.periodOrQuote(a) > this.periodOrQuote(b))
-                            return -1;
-                        if (this.periodOrQuote(a) < this.periodOrQuote(b))
-                            return 1;
-                        return 0;
-                    });
-                }
-            });
+                });
+            
+            // quote tune フェーズへ
             this.phase = 2;
         },
-        createSchedule: function () {
+        // quote tune の画面反映
+        quoteTune: function(event){
+            const slideMS = event.target.value;
+            const s = new Date(this.startOn);
+            const newEndDate = new Date(s.getTime() + Number(slideMS));
+            this.endOn = this.dispDateCeilMinute(newEndDate) + "T" + this.dispTimeCeilMinute(newEndDate);
+            this.simPeriodExp.find(e => e.id === -1).quote = Number(slideMS);
+            this.simQuoteExp.find(e => e.id === -1).quote = Number(slideMS);
+            this.simPeriodExp.sort((a, b) => {
+                if (this.periodOrQuote(a) > this.periodOrQuote(b))
+                    return -1;
+                if (this.periodOrQuote(a) < this.periodOrQuote(b))
+                    return 1;
+                return 0;
+            });
+            this.simQuoteExp.sort((a, b) => {
+                if (a.quote > b.quote)
+                    return -1;
+                if (a.quote < b.quote)
+                    return 1;
+                return 0;
+            });
+        },
+        createSchedule: function (id) {
             const startOnDate = new Date(this.startOn);
             const timezone = startOnDate.getTimezoneOffset() * -1 >= 0 ? "+" + (startOnDate.getTimezoneOffset() / 60 * -1) : (startOnDate.getTimezoneOffset() / 60 * -1);
             return {
-                id: -1,
+                id: id,
                 user_id: 1,
                 name: this.nameText,
                 color: this.selectedColor.slice(-6),
@@ -391,8 +433,24 @@ export default {
                 tags: Array.from(this.selectedTags, t => t.id),
             };
         },
+        createExperience: function () {
+            const startOnDate = new Date(this.startOn);
+            const endOnDate = new Date(this.periodEndOn);
+            const timezone = startOnDate.getTimezoneOffset() * -1 >= 0 ? "+" + (startOnDate.getTimezoneOffset() / 60 * -1) : (startOnDate.getTimezoneOffset() / 60 * -1);
+            return {
+                user_id: 1,
+                schedule_id: this.srcSchedule.id,
+                name: this.nameText,
+                color: this.selectedColor.slice(-6),
+                start_on: this.dispDate(startOnDate) + " " + this.dispTime(startOnDate) + " " + timezone,
+                end_on: this.dispDate(endOnDate) + " " + this.dispTime(endOnDate) + " " + timezone,
+                quote: this.quoteMilliSec,
+                note: this.noteText,
+                tags: Array.from(this.selectedTags, t => t.id),
+            };
+        },
         registerSchedule: function () {
-            const schedule = this.createSchedule();
+            const schedule = this.createSchedule(-1);
             schedules.push(schedule);
             $("#schedulesModal").modal("hide");
             axios.post("/api/schedules", schedule)
@@ -403,7 +461,7 @@ export default {
             });
         },
         updateSchedule: function () {
-            const schedule = this.createSchedule();
+            const schedule = this.createSchedule(-1);
             const index = schedules.indexOf(this.srcSchedule);
             if (typeof index === -1)
                 return; // TODO return でいいのか
@@ -417,7 +475,7 @@ export default {
                 });
         },
         deleteSchedule: function () {
-            const flag = confirm("本当に予定 " + this.srcSchedule.name + " を削除しますか？");
+            const flag = confirm("本当に予定 " + nameText + " を削除しますか？");
             if (!flag)
                 return;
             const index = schedules.indexOf(this.srcSchedule);
@@ -425,6 +483,32 @@ export default {
                 return; // TODO return でいいのか
             schedules.splice(index);
             $("#schedulesModal").modal("hide");
+            axios.delete("/api/schedules/" + this.srcSchedule.id)
+                .then((res) => {
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        complete: function(){
+            const flag = confirm("予定 " + this.srcSchedule.name + " を経験として保存します。");
+            if (!flag)
+                return;
+            const index = schedules.indexOf(this.srcSchedule);
+            if (typeof index === -1)
+                return; // TODO return でいいのか
+            schedules.splice(index);
+
+
+            experiences.push();
+            $("#schedulesModal").modal("hide");
+            axios.post("/api/schedules", schedule)
+                .then((res) => {
+            })
+                .catch(function (error) {
+                console.log(error);
+            });
+
             axios.delete("/api/schedules/" + this.srcSchedule.id)
                 .then((res) => {
                 })
@@ -484,19 +568,28 @@ export default {
             return hh + ":" + mm;
         }
     },
-    // watch:{
-    //     phase: function(newValue, oldValue){
-    //         console.log("phase " + oldValue +"->"+newValue);
-    //     },
-    //     updateMode: function(newValue, oldValue){
-    //         console.log("updateMode " + oldValue +"->"+newValue);
-    //     },
-    //     srcSchedule: function(newValue, oldValue){
-    //         let o = oldValue===null?"null":oldValue.id;
-    //         let n = newValue===null?"null":newValue.id;
-            
-    //         console.log("srcSchedule " + o +"->" + n);
-    //     },
-    // }
+    watch:{
+        phase: {
+            handler: function(newValue, oldValue){
+                console.log("phase " + oldValue +"->"+newValue);
+            },
+            immediate: true,
+        },
+        updateMode: {
+            handler: function(newValue, oldValue){
+                console.log("updateMode " + oldValue +"->"+newValue);
+            },
+            immediate: true,
+        },
+        srcSchedule: {
+            handler: function(newValue, oldValue){
+                let o = oldValue===null || oldValue===undefined ?"null":oldValue.id;
+                let n = newValue===null?"null":newValue.id;
+                
+                console.log("srcSchedule " + o +"->" + n);
+            },
+            immediate: true,
+        },
+    }
 }
 </script>
