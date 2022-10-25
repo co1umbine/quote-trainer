@@ -1,9 +1,9 @@
 <template>
     <div class="modal" id="schedulesModal" tabindex="-1" aria-labelledby="RegisterSchedule" aria-hidden="true">
         <div class="modal-dialog">
-            <div v-if="inputPhase" class="modal-content">
+            <div v-if="this.phase===0 || this.phase===1" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="RegisterSchedule">{{viewOnly ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
+                    <h5 class="modal-title" id="RegisterSchedule">{{this.phase===1 ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <div aria-hidden="true">&times;</div>
                     </button>
@@ -11,18 +11,19 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="scheduleName" class="form-label">スケジュール名</label>
-                        <input v-show="!viewOnly" type="text" class="form-control" id="scheduleName" v-model="nameText">
-                        <div v-show="viewOnly">{{nameText}}</div>
+                        <input v-show="this.phase===0" type="text" class="form-control" id="scheduleName" v-model="nameText">
+                        <div v-show="this.phase===1">{{nameText}}</div>
                     </div>
 
                     <div class="mb-3">
                         <div>
                             <label for="tags" class="form-label">タグ</label>
                             <div class="tag-area">
-                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';' + (viewOnly ? 'pointer-events: none;':'')" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
+                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerApply()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
+                                <!-- <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';' + (this.phase===1 ? 'pointer-events: none;':'')" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button> -->
                                 <div v-if="selectedTags.length === 0" class="silent-text" >タグは設定されていません</div>
                             </div>
-                            <select v-show="!viewOnly" name="tags" id="tagsInput" class="form-control">
+                            <select v-show="this.phase===0" name="tags" id="tagsInput" class="form-control">
                                 <option hid den>選択してください</option>
                                 <option v-for="tag in tags" :disabled="selectedTags.findIndex(t=>t.id === tag.id) !== -1" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
                             </select>
@@ -31,27 +32,27 @@
 
                     <div class="mb-3">
                         <label for="scheduleColor" class="form-label">色</label>
-                        <input :disabled="viewOnly" type="color" v-model="selectedColor" class="form-control form-control-color" id="scheduleColor" aria-describedby="colorHelp"/>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
-                        <button v-show="!viewOnly" type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
+                        <input :disabled="this.phase===1" type="color" v-model="selectedColor" class="form-control form-control-color" id="scheduleColor" aria-describedby="colorHelp"/>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
                     </div>
 
                     <div class="mb-3">
                         
                         <label>見積もり期間： {{ quote }}</label>
                         <div class="form-inline">
-                        <input :disabled="viewOnly" type="datetime-local" id="start-on"
+                        <input :disabled="this.phase===1" type="datetime-local" id="start-on"
                             name="start-on" v-model="startOn"
                             class="form-control">
                             
                         <!-- <label for="start-on"></label> -->
                         <span>&nbsp;～&nbsp;</span>
 
-                        <input :disabled="viewOnly" type="datetime-local" id="end-on"
+                        <input :disabled="this.phase===1" type="datetime-local" id="end-on"
                             name="end-on" v-model="endOn"
                             :min="startOn" class="form-control">
                         </div>
@@ -59,24 +60,23 @@
 
                     <div class="mb-3">
                         <label for="scheduleNote" class="form-label">備考</label>
-                        <textarea v-show="!this.viewOnly" type="text" class="form-control" id="scheduleNote" v-model="noteText"></textarea>
-                        <div v-show="this.viewOnly">{{ noteText }}</div>
+                        <textarea v-show="this.phase===0" type="text" class="form-control" id="scheduleNote" v-model="noteText"></textarea>
+                        <div v-show="this.phase===1">{{ noteText }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- <button v-if="this.viewOnly" type="button" @click="" class="btn white-c bg-base-c">削除</button> -->
                     
                     <button v-show="this.updateMode" type="button" @click="deleteSchedule()" class="btn ol-high-c high-c">削除</button>
-                    <button v-show="!this.viewOnly && this.updateMode" type="button" @click="()=>{this.viewOnly = true; setProperty();}" class="btn ol-dark-c dark-c">キャンセル</button>
-                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
-                    <button v-show="!this.viewOnly" type="button" @click="tentative" class="btn white-c bg-base-c">続行</button>
+                    <button v-show="this.phase===0 && this.updateMode" type="button" @click="()=>{this.phase = 1; setProperty();}" class="btn ol-dark-c dark-c">キャンセル</button>
+                    <button v-show="this.phase===1" type="button" @click="()=>{this.phase = 0;}" class="btn white-c bg-base-c">編集</button>
+                    <button v-show="this.phase===0" type="button" @click="tentative" class="btn white-c bg-base-c">続行</button>
                 </div>
             </div>
 
 
-            <div v-if="!inputPhase" class="modal-content">
+            <div v-if="this.phase===2" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="RegisterSchedule">{{viewOnly ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
+                    <h5 class="modal-title" id="RegisterSchedule">{{this.phase===1 ? "スケジュール詳細" : updateMode? "スケジュール編集" :"スケジュール新規作成"}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <div aria-hidden="true">&times;</div>
                     </button>
@@ -111,8 +111,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" @click="()=>{this.inputPhase = true;}" class="btn ol-dark-c dark-c">戻る</button>
-                    <button v-show="!this.viewOnly" type="button" @click="()=>{this.updateMode ? updateSchedule() : registerSchedule()}" class="btn white-c bg-base-c">保存</button>
+                    <button type="button" @click="()=>{this.phase = 0;}" class="btn ol-dark-c dark-c">戻る</button>
+                    <button v-show="this.phase===2" type="button" @click="()=>{this.updateMode ? updateSchedule() : registerSchedule()}" class="btn white-c bg-base-c">保存</button>
                 </div>
             </div>
         </div>
@@ -126,6 +126,13 @@ function paramsSerializer(params) {
 return qs.stringify(params);
 }
 
+// const Phase = {
+//     INPUT: 0,
+//     VIEW: 1,
+//     TUNE: 2,
+//     DONE: 3,
+// };
+
 export default {
     data() {
         return {
@@ -137,10 +144,9 @@ export default {
             startOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(targetDate.dateObject),
             endOn: this.dispDateCeilMinute(targetDate.dateObject) + "T" + this.dispTimeCeilMinute(new Date(targetDate.dateObject.setHours(targetDate.dateObject.getHours() + 1))),
             noteText: "",
-            viewOnly: false,
+            phase: 0,
             updateMode: false,
             srcSchedule: null,
-            inputPhase: true,
             simQuoteExp: [],
             simPeriodExp: [],
             pivotQuote: 0,
@@ -183,6 +189,13 @@ export default {
                 this.tags = res.data;
             });
         },
+        tagPointerApply: function(){
+            if(typeof this.phase === "undefined"){
+                return  'pointer-events: none;';
+            }else{
+                return this.phase===1 ? 'pointer-events: none;':'';
+            }
+        },
         tagApply: function () {
             document.getElementById("tagsInput").addEventListener("change", (event) => {
                 const id = event.target.value;
@@ -224,7 +237,8 @@ export default {
             // 新規作成なら空白のまま
             if (event.relatedTarget.id === "plusBtn")
                 return;
-            this.viewOnly = true;
+            this.phase = 1;
+            // this.viewOnly = true;
             this.updateMode = true;
             // ボタンを取得
             const button = $(event.relatedTarget);
@@ -244,10 +258,9 @@ export default {
             const date = new Date();
             this.startOn = this.dispDateCeilMinute(date) + "T" + this.dispTimeCeilMinute(date);
             this.endOn = this.dispDateCeilMinute(date) + "T" + this.dispTimeCeilMinute(new Date(date.setHours(date.getHours() + 1)));
-            this.viewOnly = false;
+            this.phase = 0;
             this.updateMode = false;
             this.srcSchedule = null;
-            this.inputPhase = true;
             this.simQuoteExp = [];
             this.simPeriodExp = [];
             this.pivotQuote = 0;
@@ -362,13 +375,13 @@ export default {
                     });
                 }
             });
-            this.inputPhase = false;
+            this.phase = 2;
         },
         createSchedule: function () {
             const startOnDate = new Date(this.startOn);
             const timezone = startOnDate.getTimezoneOffset() * -1 >= 0 ? "+" + (startOnDate.getTimezoneOffset() / 60 * -1) : (startOnDate.getTimezoneOffset() / 60 * -1);
             return {
-                id: this.srcSchedule===null? -1: this.srcSchedule.id,
+                id: -1,
                 user_id: 1,
                 name: this.nameText,
                 color: this.selectedColor.slice(-6),
@@ -471,5 +484,19 @@ export default {
             return hh + ":" + mm;
         }
     },
+    // watch:{
+    //     phase: function(newValue, oldValue){
+    //         console.log("phase " + oldValue +"->"+newValue);
+    //     },
+    //     updateMode: function(newValue, oldValue){
+    //         console.log("updateMode " + oldValue +"->"+newValue);
+    //     },
+    //     srcSchedule: function(newValue, oldValue){
+    //         let o = oldValue===null?"null":oldValue.id;
+    //         let n = newValue===null?"null":newValue.id;
+            
+    //         console.log("srcSchedule " + o +"->" + n);
+    //     },
+    // }
 }
 </script>
