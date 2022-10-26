@@ -90,9 +90,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="simPeriod" class="form-label">近い時間で<b>完了した</b>経験です。</label>
-                        <div v-for="ex in simPeriodExp" :key="ex.id" id="simPeriod">
-                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === -1 ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*((ex.id === srcSchedule.id ? ex.quote : ex.period)/pivotQuote)+'%'">
-                                <div>{{ ex.name }}</div> <div class="silent-text"> {{dispQuoteDate(new Date(ex.id === srcSchedule.id ? ex.quote : ex.period)) }}</div>
+                        <div v-for="ex in simPeriodExp" :key="ex.id" :id="ex.id">
+                            <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === -1 ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*((ex.id === -1 ? ex.quote : ex.period)/pivotQuote)+'%'">
+                                <div>{{ ex.name }}</div> <div class="silent-text"> {{dispQuoteDate(new Date(ex.id === -1 ? ex.quote : ex.period)) }}</div>
                             </div>
                             <hr class="bar-base-line"/>
                         </div>
@@ -100,7 +100,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="simQuote" class="form-label">近い時間に<b>見積もった</b>経験です。</label>
-                        <div  v-for="ex in simQuoteExp" :key="ex.id" id="simQuote">
+                        <div  v-for="ex in simQuoteExp" :key="ex.id" :id="ex.id">
                             <div :class="'rounded-corner-sm exp-compare-bar ' + (ex.id === -1 ? 'ol-high-c border-2':'')" :style="'background:#'+ex.color+'; width: '+ 50*(ex.quote/pivotQuote)+'%'">
                                 <div>{{ ex.name }}</div>  <div class="silent-text">{{ dispQuoteDate(new Date(ex.quote)) }}</div>
                             </div>
@@ -126,7 +126,62 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="experienceName" class="form-label">経験名</label>
+                        <div>{{nameText}}</div>
+                    </div>
 
+                    <div class="mb-3">
+                        <div>
+                            <label for="eTags" class="form-label">タグ</label>
+                            <div style="height: 45px;" id="eTags">
+                                <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerStyle()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
+                            </div>
+                            <select name="tags" id="eTagsInput" class="form-control">
+                                <option hidden>選択してください</option>
+                                <option v-for="tag in tags" :disabled="selectedTags.findIndex(t=>t.id === tag.id) !== -1" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="color" v-model="selectedColor" class="form-control form-control-color" id="experienceColor" aria-describedby="colorHelp"/>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
+                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
+                    </div>
+
+                    <div class="mb-3">
+                        <div><span class="small">見積もり期間： </span>{{ quote }} <span  class="small">に対して</span></div>
+                        <label>かかった期間： {{ period }}</label>
+                        <div class="form-inline">
+                            <input disabled type="datetime-local"
+                                name="start-on" v-model="startOn"
+                                class="form-control">
+                                
+                                
+                            <span>&nbsp;～&nbsp;</span>
+
+                            <input type="datetime-local"
+                                name="end-on" v-model="periodEndOn"
+                                :min="startOn" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>体感効率 {{efficiency}}</label>
+                        <div class="input-group form-inline flex-box fb-between">
+                            悪い <input type="range" name="efficiency" min="-2" max="2" class="form-control px-0 mx-2" v-model="efficiency"> 良い
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="experienceNote" class="form-label">備考</label>
+                        <textarea type="text" class="form-control" id="experienceNote" v-model="noteText"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="()=>{this.phase = 1; setProperty();}" class="btn ol-dark-c dark-c mx-2">キャンセル</button>
@@ -155,7 +210,7 @@ export default {
     data() {
         return {
             targetDate: targetDate,
-            
+
             nameText: "",
             tags: [],
             selectedTags: [],
@@ -191,6 +246,22 @@ export default {
         quoteMilliSec: function () {
             return new Date(this.endOn).getTime() - new Date(this.startOn).getTime();
         },
+        period: function(){
+            if(this.periodEndOn !== ""){
+                const endTime = new Date(this.periodEndOn).getTime();
+                const startTime = new Date(this.startOn).getTime();
+                const period = new Date(endTime - startTime);
+
+                if(endTime <= startTime){
+                    return "";
+                }
+                if(period.getTime() > 8.64e+7){
+                    return this.dispPeriodDate(period) +"日 "+ this.dispPeriodTime(period);
+                }else{
+                    return this.dispPeriodTime(period);
+                }
+            }
+        }
     },
     mounted() {
         this.getTags();
@@ -569,18 +640,18 @@ export default {
         }
     },
     watch:{
-        phase: {
-            handler: function(newValue, oldValue){
-                console.log("phase " + oldValue +"->"+newValue);
-            },
-            immediate: true,
-        },
-        updateMode: {
-            handler: function(newValue, oldValue){
-                console.log("updateMode " + oldValue +"->"+newValue);
-            },
-            immediate: true,
-        },
+        // phase: {
+        //     handler: function(newValue, oldValue){
+        //         console.log("phase " + oldValue +"->"+newValue);
+        //     },
+        //     immediate: true,
+        // },
+        // updateMode: {
+        //     handler: function(newValue, oldValue){
+        //         console.log("updateMode " + oldValue +"->"+newValue);
+        //     },
+        //     immediate: true,
+        // },
         srcSchedule: {
             handler: function(newValue, oldValue){
                 let o = oldValue===null || oldValue===undefined ?"null":oldValue.id;
@@ -590,6 +661,20 @@ export default {
             },
             immediate: true,
         },
+        simQuoteExp:{
+            handler: function(newValue, oldValue){
+                console.dir(newValue);
+            },
+            deep: true,
+            immediate: true,
+        },
+        simPeriodExp:{
+            handler: function(newValue, oldValue){
+                console.dir(newValue);
+            },
+            deep: true,
+            immediate: true,
+        }
     }
 }
 </script>
