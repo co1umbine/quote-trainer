@@ -57,8 +57,8 @@
 
                     <div class="mb-3">
                         <label>体感効率 {{efficiency}}</label>
-                        <div class="input-group form-inline">
-                            悪い <input :disabled="viewOnly" type="range" name="efficiency" min="-2" max="2" class="form-control" v-model="efficiency"> 良い
+                        <div class="input-group form-inline flex-box fb-between">
+                            悪い <input :disabled="viewOnly" type="range" name="efficiency" min="-2" max="2" class="form-control px-0 mx-2" v-model="efficiency"> 良い
                         </div>
                     </div>
 
@@ -70,12 +70,10 @@
                     
                 </div>
                 <div class="modal-footer">
-                    <!-- <button v-if="this.viewOnly" type="button" @click="" class="btn white-c bg-base-c">削除</button> -->
-                    
-                    <button type="button" @click="deleteExperience()" class="btn ol-high-c high-c">削除</button>
-                    <button v-show="!this.viewOnly" type="button" @click="()=>{this.viewOnly = true; refresh();}" class="btn ol-dark-c dark-c">キャンセル</button>
-                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c">編集</button>
-                    <button v-show="!this.viewOnly" type="button" @click="()=>{tentativeUpdate()}" class="btn white-c bg-base-c">続行</button>
+                    <button type="button" @click="deleteExperience()" class="btn ol-high-c high-c  mx-2">削除</button>
+                    <button v-show="!this.viewOnly" type="button" @click="()=>{this.viewOnly = true; refresh();}" class="btn ol-dark-c dark-c  mx-2">キャンセル</button>
+                    <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c  mx-2">編集</button>
+                    <button v-show="!this.viewOnly" type="button" @click="()=>{updateExperiences()}" class="btn white-c bg-base-c  mx-2">続行</button>
                 </div>
             </div>
         </div>
@@ -199,7 +197,7 @@ function paramsSerializer(params) {
                 if(!this.selectedTags.includes(tag)) return;
                 this.selectedTags = this.selectedTags.filter(n => n !== tag);
             },
-            tentativeUpdate: function(){
+            updateExperiences: function(){
                 const startOnDate = new Date(this.startOn);
                 const endOnDate = new Date(this.endOn);
                 const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);

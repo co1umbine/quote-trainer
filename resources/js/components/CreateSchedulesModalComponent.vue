@@ -86,7 +86,7 @@
                     <div class="mb-3">
                         <label for="quoteTune" class="form-label">{{nameText}} <span class="silent-text mb-2">{{quote}}</span></label>
 
-                        <input v-if="simPeriodExp.length!==0 || simQuoteExp.length!==0" v-on:input="quoteTune" class="form-control" type="range" :min="pivotQuote/2" :max="pivotQuote*2" step="600000" :value="quoteMilliSec" id="quoteTune">
+                        <input v-if="simPeriodExp.length!==0 || simQuoteExp.length!==0" v-on:input="quoteTune" class="form-control px-0" type="range" :min="pivotQuote/2" :max="pivotQuote*2" step="600000" :value="quoteMilliSec" id="quoteTune">
                     </div>
                     <div class="mb-3">
                         <label for="simPeriod" class="form-label">近い時間で<b>完了した</b>経験です。</label>
