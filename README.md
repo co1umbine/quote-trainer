@@ -1,5 +1,7 @@
 # QUOTE trainer
 
+https://quote-trainer.herokuapp.com/calendar/month
+
 QUOTE trainerはタスク所要時間の見積もり精度を高めることを目指すカレンダーWebアプリです。
 
 タスクの予定を入れる際に過去の見積もりと実際の完了時間を参照することで、ユーザーの時間感覚もアップデートさせつつ、素早く妥当な見積もりをサポートします。
