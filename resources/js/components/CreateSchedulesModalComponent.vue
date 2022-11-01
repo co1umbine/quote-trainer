@@ -146,12 +146,12 @@
 
                     <div class="mb-3">
                         <input type="color" v-model="selectedColor" class="form-control form-control-color" id="experienceColor" aria-describedby="colorHelp"/>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
-                        <button v-show="this.phase===0" type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#a7cbd9'}" class="btn btn-sm bg-themeblue-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#b5a7d9'}" class="btn btn-sm bg-themepurple-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#d9a7cb'}" class="btn btn-sm bg-themepink-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#d9b5a7'}" class="btn btn-sm bg-themeorange-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#cbd9a7'}" class="btn btn-sm bg-themeyellow-c color-select-btn"></button>
+                        <button v-show="this.phase===3" type="button" @click="() => {selectedColor = '#a7d9b5'}" class="btn btn-sm bg-themegreen-c color-select-btn"></button>
                     </div>
 
                     <div class="mb-3">
@@ -255,11 +255,7 @@ export default {
                 if(endTime <= startTime){
                     return "";
                 }
-                if(period.getTime() > 8.64e+7){
-                    return this.dispPeriodDate(period) +"日 "+ this.dispPeriodTime(period);
-                }else{
-                    return this.dispPeriodTime(period);
-                }
+                return this.dispQuoteDate(period);
             }
         }
     },
@@ -652,29 +648,29 @@ export default {
         //     },
         //     immediate: true,
         // },
-        srcSchedule: {
-            handler: function(newValue, oldValue){
-                let o = oldValue===null || oldValue===undefined ?"null":oldValue.id;
-                let n = newValue===null?"null":newValue.id;
+        // srcSchedule: {
+        //     handler: function(newValue, oldValue){
+        //         let o = oldValue===null || oldValue===undefined ?"null":oldValue.id;
+        //         let n = newValue===null?"null":newValue.id;
                 
-                console.log("srcSchedule " + o +"->" + n);
-            },
-            immediate: true,
-        },
-        simQuoteExp:{
-            handler: function(newValue, oldValue){
-                console.dir(newValue);
-            },
-            deep: true,
-            immediate: true,
-        },
-        simPeriodExp:{
-            handler: function(newValue, oldValue){
-                console.dir(newValue);
-            },
-            deep: true,
-            immediate: true,
-        }
+        //         console.log("srcSchedule " + o +"->" + n);
+        //     },
+        //     immediate: true,
+        // },
+        // simQuoteExp:{
+        //     handler: function(newValue, oldValue){
+        //         console.dir(newValue);
+        //     },
+        //     deep: true,
+        //     immediate: true,
+        // },
+        // simPeriodExp:{
+        //     handler: function(newValue, oldValue){
+        //         console.dir(newValue);
+        //     },
+        //     deep: true,
+        //     immediate: true,
+        // }
     }
 }
 </script>
