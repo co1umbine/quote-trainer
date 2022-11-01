@@ -565,17 +565,34 @@ export default {
             if (typeof index === -1)
                 return; // TODO return でいいのか
             schedules.splice(index);
+            
+            const startOnDate = new Date(this.startOn);
+            const endOnDate = new Date(this.periodEndOn);
+            const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
+            const period = new Date(this.periodEndOn).getTime() - new Date(this.startOn).getTime();
 
-
-            experiences.push();
+            const experience = {
+                    user_id: 1,
+                    schedule_id: this.srcSchedule.id,
+                    name: this.nameText,
+                    color: this.selectedColor.slice(-6),
+                    start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
+                    end_on: this.dispDate(endOnDate) +" "+ this.dispTime(endOnDate) +" "+ timezone,
+                    quote: this.srcSchedule.quote,
+                    period: period,
+                    efficiency: this.efficiency,
+                    note: this.noteText,
+                    tags: Array.from(this.selectedTags, t => t.id),
+                }
+            experiences.push(experience);
             $("#schedulesModal").modal("hide");
-            axios.post("/api/schedules", schedule)
+            axios.post("/api/experiences", experience)
                 .then((res) => {
-            })
+                })
                 .catch(function (error) {
-                console.log(error);
-            });
-
+                    console.log(error);
+                });
+            
             axios.delete("/api/schedules/" + this.srcSchedule.id)
                 .then((res) => {
                 })
