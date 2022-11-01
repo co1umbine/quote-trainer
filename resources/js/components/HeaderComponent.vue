@@ -107,10 +107,10 @@
                 if(path === monthPath){
                     const prevMonth = this.targetDate.dateObject.getMonth();
                     
-                    let dstDate = new Date(this.targetDate.dateObject.setMonth(this.targetDate.dateObject.getMonth()-1));
+                    const dstDate = new Date(this.targetDate.dateObject.setMonth(this.targetDate.dateObject.getMonth()-1));
 
                     if(prevMonth-1 !== dstDate.getMonth() && prevMonth !== 0){
-                        dstDate.setMonth(prevMonth).setDate(0);
+                        dstDate.setMonth(prevMonth, 0);
                     }
                     targetDate.dateObject = dstDate;
                 }else if(path === weekPath){
