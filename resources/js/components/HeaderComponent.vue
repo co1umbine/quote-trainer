@@ -1,6 +1,6 @@
 <template>
-    <div class="container-fluid position-sticky bg-base-c" id="navHeader">
-        <nav class="navbar" style="padding: 0.5rem 0.5rem;">
+    <div class="container-fluid position-sticky bg-base-c px-0 px-md-2" id="navHeader">
+        <nav class="navbar p-2">
             <div>
                 <button class="btn navbar-toggler svg-key-c py-2" @click="" type="button">
                     
