@@ -12,7 +12,7 @@
                 </button>
                 <span class="navbar-brand mb-0 white-c align-middle d-none d-md-inline">QUOTE trainer</span>
                 <span class="navbar-text h2 bold mb-0 white-c align-middle mr-2">{{ year }}</span>
-                <button type="button" id="m-w" onclick="location.href='#'" class="btn btn-lg key-c ol-key-c align-items-center" style="padding: 0.1rem 0.4rem; border: 2px solid; font-size: 1.5rem;">月</button>
+                <button type="button" id="m-w" onclick="location.href='#'" class="btn btn-lg key-c ol-key-c align-items-center" style="padding: 0.1rem 0.4rem; border: 2px solid;">月</button>
             </div>
 
             <div>
