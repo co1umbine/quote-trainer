@@ -37,7 +37,7 @@
             this.dispScheExps();
             this.getScheExps();
             window.addEventListener('resize', this.applyHeight);
-            $('#schedulesModal').on('hidden.bs.modal', this.getScheExps);
+            $('#schedulesModal').on('hidden.bs.modal', this.dispScheExps);
         },
         methods:{
             applyHeight: function(){

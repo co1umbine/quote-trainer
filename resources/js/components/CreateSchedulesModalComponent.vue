@@ -23,8 +23,8 @@
                                 <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerStyle()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
                                 <div v-if="selectedTags.length === 0" class="silent-text" >タグは設定されていません</div>
                             </div>
-                            <select v-show="this.phase===0" name="tags" id="tagsInput" class="form-control">
-                                <option hid den>選択してください</option>
+                            <select v-show="this.phase===0" name="tags" id="tagsInput" @change="tagApply" class="form-control">
+                                <option hidden>選択してください</option>
                                 <option v-for="tag in tags" :disabled="selectedTags.findIndex(t=>t.id === tag.id) !== -1" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
                             </select>
                         </div>
@@ -137,7 +137,7 @@
                             <div style="height: 45px;" id="eTags">
                                 <button v-for="tag in selectedTags" :key="tag.id" type="button" @click="deselectTag(tag)" :style="'background-color: #'+ tag.color +';'+tagPointerStyle()" class="btn btn-sm my-2 ml-2 dark-c btn-rounded delete-self-btn">{{ tag.name }}</button>
                             </div>
-                            <select name="tags" id="eTagsInput" class="form-control">
+                            <select name="tags" id="eTagsInput" @change="tagApply" class="form-control">
                                 <option hidden>選択してください</option>
                                 <option v-for="tag in tags" :disabled="selectedTags.findIndex(t=>t.id === tag.id) !== -1" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
                             </select>
@@ -261,7 +261,6 @@ export default {
     },
     mounted() {
         this.getTags();
-        this.tagApply();
         // 立ち上がるときの処理
         $("#schedulesModal").on("show.bs.modal", this.start);
     },
@@ -287,18 +286,17 @@ export default {
                 return this.phase===1 ? 'pointer-events: none;':'';
             }
         },
-        tagApply: function () {
-            document.getElementById("tagsInput").addEventListener("change", (event) => {
-                const id = event.target.value;
-                $("#tagsInput").val("");
-                // TODO タグを新規に追加する機能？
-                const index = this.tags.findIndex(t => t.id == id);
-                if (index === -1)
-                    return; // 未知の文字列
-                if (this.selectedTags.findIndex(t => t.id == id) === -1) { // 重複チェック
-                    this.selectedTags.push(this.tags[index]);
-                }
-            });
+        tagApply: function (event) {
+            const id = event.target.value;
+            $("#tagsInput").val("");
+            $("#eTagsInput").val("");
+            // TODO タグを新規に追加する機能？
+            const index = this.tags.findIndex(t => t.id == id);
+            if (index === -1)
+                return; // 未知の文字列
+            if (this.selectedTags.findIndex(t => t.id == id) === -1) { // 重複チェック
+                this.selectedTags.push(this.tags[index]);
+            }
         },
         deselectTag: function (tag) {
             if (!this.selectedTags.includes(tag))
@@ -503,18 +501,22 @@ export default {
         createExperience: function () {
             const startOnDate = new Date(this.startOn);
             const endOnDate = new Date(this.periodEndOn);
-            const timezone = startOnDate.getTimezoneOffset() * -1 >= 0 ? "+" + (startOnDate.getTimezoneOffset() / 60 * -1) : (startOnDate.getTimezoneOffset() / 60 * -1);
+            const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
+            const period = new Date(this.periodEndOn).getTime() - new Date(this.startOn).getTime();
+
             return {
-                user_id: 1,
-                schedule_id: this.srcSchedule.id,
-                name: this.nameText,
-                color: this.selectedColor.slice(-6),
-                start_on: this.dispDate(startOnDate) + " " + this.dispTime(startOnDate) + " " + timezone,
-                end_on: this.dispDate(endOnDate) + " " + this.dispTime(endOnDate) + " " + timezone,
-                quote: this.quoteMilliSec,
-                note: this.noteText,
-                tags: Array.from(this.selectedTags, t => t.id),
-            };
+                    user_id: 1,
+                    schedule_id: this.srcSchedule.id,
+                    name: this.nameText,
+                    color: this.selectedColor.slice(-6),
+                    start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
+                    end_on: this.dispDate(endOnDate) +" "+ this.dispTime(endOnDate) +" "+ timezone,
+                    quote: this.srcSchedule.quote,
+                    period: period,
+                    efficiency: this.efficiency,
+                    note: this.noteText,
+                    tags: Array.from(this.selectedTags, t => t.id),
+                };
         },
         registerSchedule: function () {
             const schedule = this.createSchedule(-1);
@@ -566,24 +568,7 @@ export default {
                 return; // TODO return でいいのか
             schedules.splice(index);
             
-            const startOnDate = new Date(this.startOn);
-            const endOnDate = new Date(this.periodEndOn);
-            const timezone = startOnDate.getTimezoneOffset() * -1 >=0 ? "+"+(startOnDate.getTimezoneOffset()/60 * -1) : (startOnDate.getTimezoneOffset()/60 * -1);
-            const period = new Date(this.periodEndOn).getTime() - new Date(this.startOn).getTime();
-
-            const experience = {
-                    user_id: 1,
-                    schedule_id: this.srcSchedule.id,
-                    name: this.nameText,
-                    color: this.selectedColor.slice(-6),
-                    start_on: this.dispDate(startOnDate) +" "+ this.dispTime(startOnDate) +" "+ timezone,
-                    end_on: this.dispDate(endOnDate) +" "+ this.dispTime(endOnDate) +" "+ timezone,
-                    quote: this.srcSchedule.quote,
-                    period: period,
-                    efficiency: this.efficiency,
-                    note: this.noteText,
-                    tags: Array.from(this.selectedTags, t => t.id),
-                }
+            const experience = this.createExperience();
             experiences.push(experience);
             $("#schedulesModal").modal("hide");
             axios.post("/api/experiences", experience)

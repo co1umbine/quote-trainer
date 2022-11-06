@@ -69,9 +69,7 @@
             this.getScheExps();
             setInterval(function(){this.currentTimeBar();}.bind(this), 120000);  // 2分おきに更新
             window.addEventListener('resize', this.applyHeight());
-            $('#schedulesModal').on('hidden.bs.modal', function (event) {
-                this.getScheExps();
-            });
+            $('#schedulesModal').on('hidden.bs.modal', this.dispScheExps);
         },
         methods:{
             applyHeight: function(){

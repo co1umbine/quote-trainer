@@ -73,7 +73,7 @@
                     <button type="button" @click="deleteExperience()" class="btn ol-high-c high-c  mx-2">削除</button>
                     <button v-show="!this.viewOnly" type="button" @click="()=>{this.viewOnly = true; refresh();}" class="btn ol-dark-c dark-c  mx-2">キャンセル</button>
                     <button v-show="this.viewOnly" type="button" @click="()=>{this.viewOnly = false;}" class="btn white-c bg-base-c  mx-2">編集</button>
-                    <button v-show="!this.viewOnly" type="button" @click="()=>{updateExperiences()}" class="btn white-c bg-base-c  mx-2">続行</button>
+                    <button v-show="!this.viewOnly" type="button" @click="()=>{updateExperiences()}" class="btn white-c bg-base-c  mx-2">保存</button>
                 </div>
             </div>
         </div>
@@ -218,8 +218,8 @@ function paramsSerializer(params) {
                 }
                 const index = experiences.indexOf(this.srcExperience);
                 if(typeof index === -1) return;  // TODO return でいいのか
-
-                $("#createExperiencesModal").modal("hide");
+                experiences[index] = experience;
+                $("#experiencesModal").modal("hide");
                 axios.put('/api/experiences/' + this.srcExperience.id, experience)
                     .then((res) => {
                     })
@@ -233,7 +233,7 @@ function paramsSerializer(params) {
                 if(!flag) return;
                 axios.delete('/api/experiences/' + this.srcExperience.id)
                     .then((res) => {
-                        $("#createExperiencesModal").modal("hide");
+                        $("#experiencesModal").modal("hide");
                     })
                     .catch(function (error) {
                         console.log(error);
